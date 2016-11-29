@@ -36,7 +36,6 @@ int main( int argc, char *argv[] )
 		}
 		const auto imageRgb = Magick::Image{ filepath };
 		auto imageQuantized = ImageQuantized{ imageRgb };
-		imageQuantized.write("C:\\Users\\Chris.ARES\\Temp\\toto.png");
 		const auto imageHiRes = HiRes{ imageQuantized };
 	}
 

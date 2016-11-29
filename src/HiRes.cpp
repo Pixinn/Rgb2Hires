@@ -17,12 +17,10 @@ namespace RgbToHires {
 
 	BlockHr::BlockHr(const BlockPixel& source)
 	{
-		const auto group = getGroup(source);
+		const auto groups = getGroup(source);
 		//Init data, depending on the group
-		for (auto& byte : _data) {
-			//Hi bit depending on color group
-			group == GROUP_1 ? byte = 0x0 : byte = 0x80;
-		}
+		groups.first == GROUP_1 ? _data[0] = 0x0 : _data[0] = 0x80;
+		groups.second == GROUP_1 ? _data[1] = 0x0 : _data[1] = 0x80;
 		//Getting the bit pairs
 		//Left 7 bit group
 		_data[0] |= getDibit(source[0]);
@@ -39,19 +37,30 @@ namespace RgbToHires {
 	}
 
 
-	BlockHr::eColorGroup BlockHr::getGroup(const BlockPixel& block) const
+	std::pair<BlockHr::eColorGroup, BlockHr::eColorGroup> BlockHr::getGroup(const BlockPixel& block) const
 	{
-		auto group = GROUP_1;
-		for (const auto& color : block) {
-			if (color == GREEN || color == VIOLET) {
+		std::pair<eColorGroup, eColorGroup> groups{ GROUP_1, GROUP_1 };
+		//1st block group, including the last semi-pixel
+		for (auto i = 0u; i < 4u; ++i) {
+			if (block[i] == GREEN || block[i] == VIOLET) {
 				break;
 			}
-			if (color == ORANGE || color == BLUE) {
-				group = GROUP_2;
+			else if (block[i] == ORANGE || block[i] == BLUE) {
+				groups.first = GROUP_2;
 				break;
 			}
 		}
-		return group;
+		//2nd block group, excluding the first semi-pixel
+		for (auto i = 4u; i < 7u; ++i) {
+			if (block[i] == GREEN || block[i] == VIOLET) {
+				break;
+			}
+			else if (block[i] == ORANGE || block[i] == BLUE) {
+				groups.second = GROUP_2;
+				break;
+			}
+		}
+		return groups;
 	}
 
 
@@ -81,7 +90,7 @@ namespace RgbToHires {
 	{
 		auto pixel_src = source.getConstPixels(0u, 0u, WIDTH, HEIGHT);
 
-		for (auto& line : _blobHr) {
+		for (auto& line : _blob) {
 			for (auto& block : line) {
 				BlockPixel blockPxRgb;
 				for (auto& pxRgb : blockPxRgb) {

@@ -9,8 +9,7 @@
 
 namespace RgbToHires {
 
-	using BlockPixel = std::array<Magick::PixelPacket, 7>;
-	using LinePixel = std::array<BlockPixel, 20>;
+	using BlockPixel = std::array<Magick::PixelPacket, 7u>;
 	
 	class BlockHr
 	{
@@ -27,7 +26,7 @@ namespace RgbToHires {
 		};
 		/// \brief Returns the color group of these two pixel blocks
 		///		   Works on double blocks instead of single blocks
-		eColorGroup getGroup(const BlockPixel&) const;
+		std::pair<eColorGroup, eColorGroup> getGroup(const BlockPixel&) const;
 		/// \brief Returns the bit pait corresponding to the given color
 		uint8_t getDibit(const Magick::Color&) const;
 
@@ -35,8 +34,7 @@ namespace RgbToHires {
 	};
 	
 	using LineHr = std::array<BlockHr, 10>;
-	template<class T>
-	using Blob = std::array<T, 192>;
+	using Blob = std::array<LineHr, 192>;
 
 	class HiRes
 	{
@@ -46,9 +44,7 @@ namespace RgbToHires {
 
 
 	private:
-		
-		Blob<LinePixel> _blobPx;	///< A frame ordered buffer of pixels
-		Blob<LineHr>    _blobHr;	///< A frame ordered buffer of hires data
+		Blob    _blob;	///< A frame ordered buffer of hires data
 	};
 
 
