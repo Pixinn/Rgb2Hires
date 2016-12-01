@@ -1,6 +1,7 @@
 
 #include <exception>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <Magick++.h>
@@ -19,15 +20,24 @@ inline bool exists(const std::string& path)
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
+/// \brief Program entry point
 int main( int argc, char *argv[] )
 {
 	Magick::InitializeMagick(*argv);
 
 	//Parsing command line
 	TCLAP::CmdLine cmd("rgbtohires", ' ', "0");
-	TCLAP::ValueArg<string> imagePath("i", "image", "Image path", true, "", "path_to_image");
+	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "path_to_image");
+	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "path_to_output");
+	TCLAP::SwitchArg assembly("a", "asm", "Output asm format");
 	cmd.add(imagePath);
+	cmd.add(outputPath);
+	cmd.add(assembly);
 	cmd.parse(argc, argv);
+
+	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
+		return -1;
+	}
 
 	try {
 		const auto filepath = imagePath.getValue();
@@ -36,7 +46,16 @@ int main( int argc, char *argv[] )
 		}
 		const auto imageRgb = Magick::Image{ filepath };
 		auto imageQuantized = ImageQuantized{ imageRgb };
-		const auto imageHiRes = HiRes{ imageQuantized };
+		const auto imageHiRes = HiRes{ imageQuantized };		
+		if (assembly.getValue() == true) {    //Ouput in ASM
+			ofstream output(outputPath.getValue());
+			output << imageHiRes.getAsm();
+		}
+		else {	//Binary output
+			ofstream output(outputPath.getValue(), ios::binary);
+			const auto bytes = imageHiRes.getBlob();
+			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
+		}
 	}
 
 	//Fatal error

@@ -1,4 +1,9 @@
 ./x64
 ./x86
+./RgbToHiRes.vcxproj.user
+*.sln
+*.bin
+*.asm
+**/.vs
 **/Debug
 **/Release
