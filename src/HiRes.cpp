@@ -34,8 +34,8 @@ namespace RgbToHires {
 		_data[1] |= (getDibit(source[6]) << 5);
 		//Middle pixel
 		auto byte = getDibit(source[3]);
-		_data[0] |= (((byte>>1) & 0x1) << 6);
-		_data[1] |=  (byte & 0x1);
+		_data[0] |= ((byte & 0x1) << 6);
+		_data[1] |=  ((byte >> 1) & 0x1);
 	}
 
 

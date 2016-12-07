@@ -1,6 +1,7 @@
-./x64
-./x86
-./RgbToHiRes.vcxproj.user
+x64
+x86
+RgbToHiRes.vcxproj.user
+RgbToHiRes.VC.*
 *.sln
 *.bin
 *.asm
