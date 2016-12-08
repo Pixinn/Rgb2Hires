@@ -3,7 +3,7 @@ APPLE2_CC	:= $(CC65_HOME)/bin/cc65
 APPLE2_SRC	:= src/file_io.c src/mli.asm src/main.c
 APPLE2_MAP  := hires.map
 APPLE2_CFLAGS	:= -Oirs -v -t apple2
-APPLE2_OUT	:= bin/hires.a2
+APPLE2_OUT	:= bin/loader.a2
 
 all:	directories apple2
 

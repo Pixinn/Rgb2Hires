@@ -4,7 +4,6 @@ RgbToHiRes.vcxproj.user
 RgbToHiRes.VC.*
 *.sln
 *.bin
-*.asm
 **/.vs
 **/Debug
 **/Release
