@@ -7,3 +7,6 @@ RgbToHiRes.VC.*
 **/.vs
 **/Debug
 **/Release
+**/*.o
+**/*.map
+**/bin/

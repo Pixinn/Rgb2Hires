@@ -35,13 +35,6 @@ _call_to_mli:
         JSR     popa
         STA     Mli_Call
 
-        ;+ DEBUG
-;        CMP #$CE
-;        BNE continue
-;debug:  JMP debug
-;continue:
-        ;- DEBUG
-
         ; Call MLI and return
         JSR     $BF00           ; MLI call entry point
 Mli_Call:
