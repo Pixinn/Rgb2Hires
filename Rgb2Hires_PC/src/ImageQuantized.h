@@ -27,6 +27,8 @@
 
 namespace RgbToHires {
 
+    /// @brief Image quantized to the HIRES colors.
+    /// @details Quantization works with a nearest distance algorithm.
 	class ImageQuantized :
 		public Magick::Image
 	{
@@ -39,10 +41,11 @@ namespace RgbToHires {
 		ImageQuantized(const Magick::Image& src);
 		~ImageQuantized()=default;
 
+        /// @brief Returns an array of bytes forming the RGB quantized image
 		std::unique_ptr<Blob> getBlob() const;
 
 	private:
-
+        /// @brief Computes the euclidian distance between two colors
 		double Distance(const Magick::Color&, const Magick::Color&);
 
 	};

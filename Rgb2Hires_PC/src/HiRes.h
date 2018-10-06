@@ -35,27 +35,27 @@ namespace RgbToHires {
 	class BlockHr
 	{
 	public:
-		/// \brief Default constructor: all black
+		/// @brief Default constructor: all black
 		BlockHr();
-		/// \brief Construction from 7 pixels
+		/// @brief Construction from 7 pixels
 		BlockHr(const BlockPixel& );
-		/// \brief returns the position of the first element
+		/// @brief returns the position of the first element
 		inline std::array<uint8_t, 2>::const_iterator begin() const {
 			return _data.begin();
 		}
-		/// \brief returns the position after the last element
+		/// @brief returns the position after the last element
 		inline std::array<uint8_t, 2>::const_iterator end() const {
 			return _data.end();
 		}
 	private:
-		/// \brief color group as defined in Apple's documentation
+		/// @brief color group as defined in Apple's documentation
 		enum eColorGroup {
 			GROUP_1,
 			GROUP_2
 		};
-		/// \brief Returns the color group of these two 3.5 pixel blocks
+		/// @brief Returns the color group of these two 3.5 pixel blocks
 		std::pair<eColorGroup, eColorGroup> getGroup(const BlockPixel&) const;
-		/// \brief Returns the bit pait corresponding to the given color
+		/// @brief Returns the bit pait corresponding to the given color
 		uint8_t getDibit(const Magick::Color&) const;
 
 		std::array<uint8_t, 2> _data;
@@ -68,7 +68,7 @@ namespace RgbToHires {
 	using Blob = std::array<LineHr, NB_LINES_PER_SCREEN>;
 
 
-
+    /// @brief Describes an HIRES image
 	class HiRes
 	{
 	public:
@@ -77,9 +77,9 @@ namespace RgbToHires {
 		HiRes(const ImageQuantized&);
 		~HiRes() = default;
 
-		/// \brief Returns the binary hires picture
+		/// @brief Returns the binary hires picture
 		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getBlob() const;
-		/// \brief Returns asm code corresponding to the image in memory (CA65 format)
+		/// @brief Returns asm code corresponding to the image in memory (CA65 format)
 		std::string getAsm() const;
 
 	private:

@@ -1,7 +1,7 @@
 #Rgb2Hires
 This program converts an RGB image to the Apple II's "HiRes" format. Provided it complies with this format's constraints:
 
-* Source image must be 140x280. Pixels are anamorphic: twice wider than tall.
+* Source image must be 140x192. Pixels are anamorphic: twice wider than tall.
 * Source image must contains six colors : BLACK, WHITE, ORANGE, GREEN, BLUE and PURPLE
 
 For more information about the "Hires" format and its limitations, please refer to Wikipedia: https://en.wikipedia.org/wiki/Apple_II_graphics#High-Resolution_.28Hi-Res.29_graphics
@@ -29,4 +29,5 @@ It is a Makefile project and must be crosscompiled using **[CC65](https://cc65.g
 
 # Running
 A correct source image, *test.png*, is provided as an example. Convert it into a file named *test.picture* and copy it along the Apple II *Loader*, then execute on the actual hardware ;)
+
 

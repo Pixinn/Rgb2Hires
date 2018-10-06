@@ -31,14 +31,14 @@
 using namespace std;
 using namespace RgbToHires;
 
-/// \brief Returns true if a file exists
+/// @brief Returns true if a file exists
 inline bool exists(const std::string& path)
 {
 	struct stat buffer;
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
-/// \brief Program entry point
+/// @brief Program entry point
 int main( int argc, char *argv[] )
 {
 	Magick::InitializeMagick(*argv);
