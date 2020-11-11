@@ -26,7 +26,8 @@
 #include <tclap/CmdLine.h>
 
 #include "ImageQuantized.h"
-#include "HiRes.h"
+#include "Picture.h"
+#include "Tile.h"
 
 using namespace std;
 using namespace RgbToHires;
@@ -41,7 +42,7 @@ inline bool exists(const std::string& path)
 /// @brief Program entry point
 int main( int argc, char *argv[] )
 {
-	Magick::InitializeMagick(*argv);
+    Magick::InitializeMagick(*argv);
 
 	//Parsing command line
 	TCLAP::CmdLine cmd("rgbtohires", ' ', "0");
@@ -54,17 +55,18 @@ int main( int argc, char *argv[] )
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
+		std::cout << "No input or output path privided.";
 		return -1;
 	}
 
-	try {
+	try {        
 		const auto filepath = imagePath.getValue();
 		if (!exists(filepath)) {
 			throw runtime_error("Cannot read " + filepath);
 		}
 		const auto imageRgb = Magick::Image{ filepath };
 		auto imageQuantized = ImageQuantized{ imageRgb };
-		const auto imageHiRes = HiRes{ imageQuantized };		
+		const auto imageHiRes = Picture{ imageQuantized };	
 		if (assembly.getValue() == true) {    //Ouput in ASM
 			ofstream output(outputPath.getValue());
 			output << imageHiRes.getAsm();

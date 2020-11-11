@@ -38,23 +38,23 @@ void __fastcall__ error(const uint8_t err) {
 }
 
 
-static char Filename[64] = "test.picture";
+// static char Filename[64] = "test.picture";
 int main( int argc, char* argv[] )
 {
-  uint8_t handle;
-  (void)argc;
-  (void)argv;
+  // uint8_t handle;
+  // (void)argc;
+  // (void)argv;
 
-  file_open(Filename, &handle);
-  if( file_read( handle, (uint8_t*)HIRES_PAGE1, HIRES_PAGE_SIZE ) != HIRES_PAGE_SIZE )  {
-    error(file_error());
-  }
-  file_close(handle);
+  // file_open(Filename, &handle);
+  // if( file_read( handle, (uint8_t*)HIRES_PAGE1, HIRES_PAGE_SIZE ) != HIRES_PAGE_SIZE )  {
+    // error(file_error());
+  // }
+  // file_close(handle);
 
-  SWITCH_GRAPHICS;
-  SWITCH_FULLSCREEN;
-  SWITCH_PAGE1;
-  SWITCH_HIRES;
+  // SWITCH_GRAPHICS;
+  // SWITCH_FULLSCREEN;
+  // SWITCH_PAGE1;
+  // SWITCH_HIRES;
 
   return 0;
 }

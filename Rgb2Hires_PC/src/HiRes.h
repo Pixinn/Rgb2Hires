@@ -32,6 +32,7 @@ namespace RgbToHires {
 
 	using BlockPixel = std::array<Magick::PixelPacket, 7u>;
 	
+	/// @brief A block of 7 pixels
 	class BlockHr
 	{
 	public:
@@ -61,39 +62,6 @@ namespace RgbToHires {
 		std::array<uint8_t, 2> _data;
 	};
 	
-
-	static constexpr unsigned NB_BLOCK_PER_LINES = 20u;
-	static constexpr unsigned NB_LINES_PER_SCREEN = 192u;
-	using LineHr = std::vector<BlockHr>;
-	using Blob = std::array<LineHr, NB_LINES_PER_SCREEN>;
-
-
-    /// @brief Describes an HIRES image
-	class HiRes
-	{
-	public:
-		static constexpr unsigned FRAME_SIZE = 192 * 40 + 512; ///< Frame size in byte
-
-		HiRes(const ImageQuantized&);
-		~HiRes() = default;
-
-		/// @brief Returns the binary hires picture
-		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getBlob() const;
-		/// @brief Returns asm code corresponding to the image in memory (CA65 format)
-		std::string getAsm() const;
-
-	private:
-		Blob    _blob;	///< A frame ordered buffer of hires data		
-		static constexpr std::array<const uint16_t, 192 / 8> _lineAdresses = {
-			0x2000, 0x2080, 0x2100, 0x2180, 0x2200, 0x2280, 0x2300, 0x2380,
-			0x2028, 0x20a8, 0x2128, 0x21a8, 0x2228, 0x22a8, 0x2328, 0x23a8,
-			0x2050, 0x20d0, 0x2150, 0x21d0, 0x2250, 0x22d0, 0x2350, 0x23d0
-		};
-		static constexpr std::array<const uint16_t, 8> _lineOffsets = {
-			0x0, 0x400, 0x800, 0xc00, 0x1000, 0x1400, 0x1800, 0x1c00
-		};
-		std::map<const uint16_t, const LineHr*> _hrOrderedLines; ///< map<adress,line's data>
-	};
 
 
 }

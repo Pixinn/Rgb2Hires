@@ -19,46 +19,39 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\HiRes.h" />
-    <ClInclude Include="src\ImageQuantized.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\HiRes.cpp" />
-    <ClCompile Include="src\ImageQuantized.cpp" />
-    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="..\..\src\App_Picture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{754364B2-84E3-40A5-B838-C153775D8F4C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RgbToHiRes</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
-    <ProjectName>Rgb2HiRes</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Picture</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -120,14 +113,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\src;$(MAGICK_HOME)\ImageMagick\Magick++\lib;$(MAGICK_HOME)\ImageMagick</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(MAGICK_HOME)\ImageMagick\Magick++\lib;$(MAGICK_HOME)\ImageMagick</AdditionalIncludeDirectories>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(MAGICK_HOME)\VisualMagick\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>CORE_DB_Magick++_.lib;CORE_DB_Magick_.lib;CORE_DB_wand_.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);$(MAGICK_HOME)\VisualMagick\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CORE_DB_Magick++_.lib;CORE_DB_Magick_.lib;CORE_DB_wand_.lib;libRgb2Hires.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -161,15 +154,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\src;$(MAGICK_HOME)\ImageMagick\Magick++\lib;$(MAGICK_HOME)\ImageMagick</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(MAGICK_HOME)\ImageMagick\Magick++\lib;$(MAGICK_HOME)\ImageMagick</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(MAGICK_HOME)\VisualMagick\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>CORE_RL_Magick++_.lib;CORE_RL_Magick_.lib;CORE_RL_wand_.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);$(MAGICK_HOME)\VisualMagick\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CORE_RL_Magick++_.lib;CORE_RL_Magick_.lib;CORE_RL_wand_.lib;libRgb2Hires.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
