@@ -6,6 +6,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libRgb2Hires", "projects\libRgb2Hires\libRgb2Hires.vcxproj", "{CA6F93C8-86B1-4F88-A1E8-8613ED5802AB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Picture", "projects\picture\Picture.vcxproj", "{754364B2-84E3-40A5-B838-C153775D8F4C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CA6F93C8-86B1-4F88-A1E8-8613ED5802AB} = {CA6F93C8-86B1-4F88-A1E8-8613ED5802AB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tile", "projects\Tile\Tile.vcxproj", "{C0C03B35-A98E-4F57-9399-A07068B23AB2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CA6F93C8-86B1-4F88-A1E8-8613ED5802AB} = {CA6F93C8-86B1-4F88-A1E8-8613ED5802AB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +39,14 @@ Global
 		{754364B2-84E3-40A5-B838-C153775D8F4C}.Release|x64.Build.0 = Release|x64
 		{754364B2-84E3-40A5-B838-C153775D8F4C}.Release|x86.ActiveCfg = Release|Win32
 		{754364B2-84E3-40A5-B838-C153775D8F4C}.Release|x86.Build.0 = Release|Win32
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Debug|x64.ActiveCfg = Debug|x64
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Debug|x64.Build.0 = Debug|x64
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Debug|x86.ActiveCfg = Debug|Win32
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Debug|x86.Build.0 = Debug|Win32
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Release|x64.ActiveCfg = Release|x64
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Release|x64.Build.0 = Release|x64
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Release|x86.ActiveCfg = Release|Win32
+		{C0C03B35-A98E-4F57-9399-A07068B23AB2}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

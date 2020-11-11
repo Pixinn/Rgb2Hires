@@ -1,6 +1,6 @@
 
 /* Rgb2Hires
-* Copyright (C) 2016 Christophe Meneboeuf <christophe@xtof.info>
+* Copyright (C) 2020 Christophe Meneboeuf <christophe@xtof.info>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -45,13 +45,11 @@ int main( int argc, char *argv[] )
     Magick::InitializeMagick(*argv);
 
 	//Parsing command line
-	TCLAP::CmdLine cmd("Picture", ' ', "0");
+	TCLAP::CmdLine cmd("Tile", ' ', "0");
 	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "path_to_image");
 	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "path_to_output");
-	TCLAP::SwitchArg assembly("a", "asm", "Output asm format");
 	cmd.add(imagePath);
 	cmd.add(outputPath);
-	cmd.add(assembly);
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
@@ -66,16 +64,12 @@ int main( int argc, char *argv[] )
 		}
 		const auto imageRgb = Magick::Image{ filepath };
 		auto imageQuantized = ImageQuantized{ imageRgb };
-		const auto imageHiRes = Picture{ imageQuantized };	
-		if (assembly.getValue() == true) {    //Ouput in ASM
-			ofstream output(outputPath.getValue());
-			output << imageHiRes.getAsm();
-		}
-		else {	//Binary output
-			ofstream output(outputPath.getValue(), ios::binary);
-			const auto bytes = imageHiRes.getBlob();
-			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
-		}
+		const auto tileHiRes = Tile{ imageQuantized };	
+		
+		// Always output in asm
+		ofstream output(outputPath.getValue());
+		output << tileHiRes.getAsm();
+
 	}
 
 	//Fatal error
