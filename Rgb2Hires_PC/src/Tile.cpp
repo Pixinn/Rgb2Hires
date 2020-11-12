@@ -2,9 +2,11 @@
 #include <iomanip>
 #include "Tile.h"
 
-RgbToHires::Tile::Tile(const ImageQuantized& source)
+RgbToHires::Tile::Tile(const ImageQuantized& source, const unsigned col, const unsigned line)
 {
-  auto pixel_src = source.getConstPixels(0u, 0u, 14, 16);
+	constexpr unsigned w_tile = 14;
+	constexpr unsigned h_tile = 16;
+  auto pixel_src = source.getConstPixels(col * w_tile, line * h_tile, w_tile, h_tile);
 
 	//Filling the storage with BlockHrs
 	for (auto& line : _blob) {

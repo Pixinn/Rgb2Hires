@@ -15,7 +15,7 @@ namespace RgbToHires
   {
   public:
     /// @brief Constructs the tile from the upper left corner of a 140x192 quantized image
-    Tile(const ImageQuantized&);
+    Tile(const ImageQuantized&, const unsigned col, const unsigned line);
     ~Tile() = default;
 
     /// @brief Returns asm code corresponding to the tile: the lines are not interleaved!

@@ -46,25 +46,38 @@ int main( int argc, char *argv[] )
 
 	//Parsing command line
 	TCLAP::CmdLine cmd("Tile", ' ', "0");
-	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "path_to_image");
-	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "path_to_output");
+	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "string");
+	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "string");
+	TCLAP::ValueArg<unsigned> column("c", "column", "Column number in the tile sheet. Starts at 0.", true, 0u, "integer");
+	TCLAP::ValueArg<unsigned> line("l", "line", "Line number in the tile sheet. Starts at 0.", true, 0u, "integer");
 	cmd.add(imagePath);
 	cmd.add(outputPath);
+	cmd.add(column);
+	cmd.add(line);
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
 		std::cout << "No input or output path privided.";
 		return -1;
 	}
+	if (column.getValue() > 9) {
+		std::cout << "Column number shall be < 9";
+		return -1;
+	}
+	if (line.getValue() > 11) {
+		std::cout << "Line number shall be < 11";
+		return -1;
+	}
 
-	try {        
+	try
+	{        
 		const auto filepath = imagePath.getValue();
 		if (!exists(filepath)) {
 			throw runtime_error("Cannot read " + filepath);
 		}
 		const auto imageRgb = Magick::Image{ filepath };
 		auto imageQuantized = ImageQuantized{ imageRgb };
-		const auto tileHiRes = Tile{ imageQuantized };	
+		const auto tileHiRes = Tile{ imageQuantized, column.getValue(), line.getValue()};
 		
 		// Always output in asm
 		ofstream output(outputPath.getValue());
