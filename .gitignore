@@ -1,9 +1,10 @@
-**/bin
-**/x64
-**/x86
-**/.vs
-**/Debug
-**/Release
+**/bin/
+**/x64/
+**/x86/
+**/.vs/
+**/Debug/
+**/Release/
+**/build/
 *.user
 *.filters
 *.o

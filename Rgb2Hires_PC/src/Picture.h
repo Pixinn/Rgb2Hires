@@ -40,7 +40,7 @@ namespace RgbToHires
 		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getBlob() const;
 		/// @brief Returns asm code corresponding to the image in memory (CA65 format)
 		std::string getAsm() const;
-
+		 
 	private:
 
 		using LineHr = std::vector<BlockHr>;
