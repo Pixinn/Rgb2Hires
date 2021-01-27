@@ -10,16 +10,16 @@ if (( $# != 4 )); then
     exit
 fi
 
-echo " . revoving previous instance of DISPLAY form the disk"
+echo " . removing previous instance of DISPLAY form the disk"
 java -jar ${1} -d ${4} DISPLAY
 
 echo " .. adding DISPLAY to the disk"
 java -jar ${1} -cc65 ${4} DISPLAY BIN < ${2}
 
-echo " . revoving previous instance of PICTURE form the disk"
+echo " . removing previous instance of PICTURE form the disk"
 java -jar ${1} -d ${4} PICTURE
 
-# echo " .. adding PICTURE to the disk"
-java -jar ${1} -cc65 ${4} PICTURE BIN < ${3}
+echo " .. adding PICTURE to the disk"
+java -jar ${1} -p ${4} PICTURE BIN < ${3}
 
 echo "DONE."

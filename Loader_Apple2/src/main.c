@@ -25,36 +25,42 @@
 /* My headers */
 #include "file_io.h"
 
-#define HIRES_PAGE1     0x2000
+/****** HIRES SCREEN DEFINITIONS ***********/
+#define HIRES_PAGE1     (char*)0x2000
+#define HIRES_PAGE2     (char*)0x4000
 #define HIRES_PAGE_SIZE 0x2000
+#define SWITCH_TEXT *((uint8_t*)0xC050)=0
 #define SWITCH_GRAPHICS *((uint8_t*)0xC050)=1
 #define SWITCH_FULLSCREEN *((uint8_t*)0xC052)=1
-#define SWITCH_PAGE1 *((uint8_t*)0xC054)=1
+#define SWITCH_PAGE1 *((uint8_t*)0xC055)=0
+#define SWITCH_PAGE2 *((uint8_t*)0xC055)=1
 #define SWITCH_HIRES *((uint8_t*)0xC057)=1
+
 
 void __fastcall__ error(const uint8_t err) {
   printf("\n ERROR: %u", err);
   exit(-1);
 }
 
-
-// static char Filename[64] = "test.picture";
-int main( int argc, char* argv[] )
+void main( )
 {
-  // uint8_t handle;
-  // (void)argc;
-  // (void)argv;
+  uint8_t handle;
+  int size_read;
 
-  // file_open(Filename, &handle);
-  // if( file_read( handle, (uint8_t*)HIRES_PAGE1, HIRES_PAGE_SIZE ) != HIRES_PAGE_SIZE )  {
-    // error(file_error());
-  // }
-  // file_close(handle);
-
-  // SWITCH_GRAPHICS;
-  // SWITCH_FULLSCREEN;
-  // SWITCH_PAGE1;
-  // SWITCH_HIRES;
-
-  return 0;
+  file_open("PICTURE", &handle);
+  size_read = file_read( handle, (uint8_t*)HIRES_PAGE2, HIRES_PAGE_SIZE );
+  if( file_error() != NO_ERROR )  {
+    printf("\nERROR, CANNOT READ PICTURE\nERRNO: %x\nn", file_error());
+    file_close(handle);
+    exit(-1);
+  }
+  file_close(handle);
+  
+  SWITCH_GRAPHICS;
+  SWITCH_FULLSCREEN;
+  SWITCH_PAGE2;
+  SWITCH_HIRES;
+  
+  
+  exit(0);
 }
