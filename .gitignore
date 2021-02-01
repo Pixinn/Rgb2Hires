@@ -5,6 +5,7 @@
 **/Debug/
 **/Release/
 **/build/
+**/build_*/
 *.user
 *.filters
 *.o
