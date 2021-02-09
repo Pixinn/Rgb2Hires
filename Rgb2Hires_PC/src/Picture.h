@@ -47,8 +47,6 @@ namespace RgbToHires
 		using Blob = std::array<LineHr, NB_LINES_PER_SCREEN>;
 
 		Blob    _blob;	///< A frame ordered buffer of hires data		
-		static const std::array<const uint16_t, 192 / 8> _lineAdresses;
-		static const std::array<const uint16_t, 8> _lineOffsets;
 		std::map<const uint16_t, const LineHr*> _hrOrderedLines; ///< map<adress,line's data>
 	};
 

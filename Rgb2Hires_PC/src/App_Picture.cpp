@@ -29,6 +29,7 @@
 #include "ImageQuantized.h"
 #include "Picture.h"
 #include "Tile.h"
+#include "Display.h"
 
 using namespace std;
 using namespace RgbToHires;
@@ -77,6 +78,10 @@ int main( int argc, char *argv[] )
 			const auto bytes = imageHiRes.getBlob();
 			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
 		}
+
+		const auto bytes = imageHiRes.getBlob();
+		Display::Display(bytes->data());
+
 	}
 
 	//Fatal error

@@ -6,16 +6,6 @@ using namespace std;
 namespace RgbToHires
 {
 
-	const std::array<const uint16_t, 192 / 8> Picture::_lineAdresses = {
-		 0x2000, 0x2080, 0x2100, 0x2180, 0x2200, 0x2280, 0x2300, 0x2380,
-		 0x2028, 0x20a8, 0x2128, 0x21a8, 0x2228, 0x22a8, 0x2328, 0x23a8,
-		 0x2050, 0x20d0, 0x2150, 0x21d0, 0x2250, 0x22d0, 0x2350, 0x23d0
-	};
-
-	const std::array<const uint16_t, 8> Picture::_lineOffsets = {
-	0x0, 0x400, 0x800, 0xc00, 0x1000, 0x1400, 0x1800, 0x1c00
-	};
-
 	Picture::Picture(const ImageQuantized& source)
 	{
 		auto pixel_src = source.getConstPixels(0u, 0u, WIDTH, HEIGHT);
@@ -34,7 +24,7 @@ namespace RgbToHires
 		//Constructing the map used to interleave the lines
 		auto i = 0u;
 		for (const auto& line : _blob) {
-			auto addr_interleaved = _lineAdresses[i / 8] + _lineOffsets[i % 8];
+			auto addr_interleaved = LineAdresses[i / 8] + LineOffsets[i % 8];
 			_hrOrderedLines.insert(pair<const uint16_t, const LineHr*>(addr_interleaved, &line));
 			++i;
 		}

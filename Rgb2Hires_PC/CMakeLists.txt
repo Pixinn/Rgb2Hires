@@ -17,6 +17,11 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # dependencies
 if(WIN32)	
+	# sdl2
+	if(NOT DEFINED ENV{SDL2_HOME})
+		message(FATAL_ERROR "Please set a SDL2_HOME environment variable to the root directory of SDL2")		
+	endif()
+	set(SDL2_DIR $ENV{SDL2_HOME})
 	# imagemagik
 	if(NOT DEFINED ENV{MAGICK_HOME})
 		message(FATAL_ERROR "Please set a MAGICK_HOME environment variable to the root directory of ImageMagick6")		
@@ -25,6 +30,7 @@ if(WIN32)
 else()
 	find_package(ImageMagick 6.9 EXACT REQUIRED COMPONENTS Magick++ )
 endif(WIN32)
+find_package(SDL2 REQUIRED)
 
 # directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin/debug)
@@ -40,16 +46,18 @@ add_library(${PROJECT_NAME} src/Common.h
 							src/Picture.cpp
 							src/Tile.h
 							src/Tile.cpp
+							src/Display.h
+							src/Display.cpp
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE MAGICKCORE_QUANTUM_DEPTH=16 MAGICKCORE_HDRI_ENABLE=0)
-target_include_directories(${PROJECT_NAME} PRIVATE ${ImageMagick_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${ImageMagick_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS})
 
 
 # Application Picture
 add_executable(Picture src/App_Picture.cpp)
 target_compile_definitions(Picture PUBLIC MAGICKCORE_QUANTUM_DEPTH=16 MAGICKCORE_HDRI_ENABLE=0)
 target_include_directories(Picture PRIVATE src ${ImageMagick_INCLUDE_DIRS})
-target_link_libraries(Picture ${ImageMagick_LIBRARIES} ${PROJECT_NAME})    
+target_link_libraries(Picture ${ImageMagick_LIBRARIES} ${SDL2_LIBRARIES} ${PROJECT_NAME})    
 set_property(TARGET Picture PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
 
 # Application Tile
@@ -62,14 +70,8 @@ set_property(TARGET Tile PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPU
 
 # Windows only: copy dlls
 if(WIN32)
-	if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		string (REPLACE "/" "\\" WIN_BIN_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
-		add_custom_command(TARGET Picture POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/copy_im_db_dlls.bat ${WIN_BIN_DIR})
-		add_custom_command(TARGET Tile POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/copy_im_db_dlls.bat ${WIN_BIN_DIR})
-	else()
-		string (REPLACE "/" "\\" WIN_BIN_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE})
-		add_custom_command(TARGET Picture POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/copy_im_rl_dlls.bat ${WIN_BIN_DIR})
-		add_custom_command(TARGET Tile POST_BUILD COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/copy_im_rl_dlls.bat ${WIN_BIN_DIR})
-	endif()
-			
+		set(DEBUG_EXE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scripts/copy_im_db_dlls.bat")
+		set(RELEASE_EXE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scripts/copy_im_rl_dlls.bat")
+		string (REPLACE "/" "\\" WIN_BIN_DIR "$<$<CONFIG:debug>:${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}>$<$<CONFIG:release>:${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}>")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND "$<$<CONFIG:debug>:${DEBUG_EXE_PATH}>$<$<CONFIG:release>:${RELEASE_EXE_PATH}>" ${WIN_BIN_DIR})			
 endif(WIN32)
