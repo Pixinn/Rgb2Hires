@@ -51,9 +51,11 @@ int main( int argc, char *argv[] )
 	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "path_to_image");
 	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "path_to_output");
 	TCLAP::SwitchArg assembly("a", "asm", "Output asm format");
+	TCLAP::SwitchArg preview("p", "preview", "Open a window to display a preview.");
 	cmd.add(imagePath);
 	cmd.add(outputPath);
 	cmd.add(assembly);
+	cmd.add(preview);
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
@@ -61,7 +63,8 @@ int main( int argc, char *argv[] )
 		return -1;
 	}
 
-	try {        
+	try
+	{        
 		const auto filepath = imagePath.getValue();
 		if (!exists(filepath)) {
 			throw runtime_error("Cannot read " + filepath);
@@ -80,7 +83,7 @@ int main( int argc, char *argv[] )
 		}
 
 		const auto bytes = imageHiRes.getBlob();
-		Display::Display(bytes->data());
+		Display::Window::GetInstance()->display(filepath, bytes->data());
 
 	}
 

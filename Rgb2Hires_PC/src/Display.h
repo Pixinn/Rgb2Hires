@@ -21,12 +21,48 @@
 #include "ImageQuantized.h"
 #include "HiRes.h"
 
+struct SDL_Window;
+struct SDL_Renderer;
+struct SDL_Texture;
+
 namespace RgbToHires
 {
 	namespace Display
-	{
+	{    
 
-    void Display(uint8_t* blob);
+    struct rgba8Bits_t
+    {
+      uint8_t r = 0;
+      uint8_t g = 0;
+      uint8_t b = 0;
+      uint8_t a = 0xff;
+    };
+
+    using Block = std::array<rgba8Bits_t, 14>;
+    using Line = std::array<Block, 40>;
+    using Screen = std::array<Line, 192 * 2>;
+
+    class Window
+    {
+    public:
+      Window() = default;
+      ~Window();
+      
+      static Window* GetInstance();
+
+      void display(const std::string& path, const uint8_t* hiresblob);
+
+    private:
+      bool init();
+      void sdlError(const std::string& msg);
+
+      static Window* S_pInstance;
+      static const int SCALE = 2;
+
+      SDL_Window*    _pWindow = nullptr;
+      SDL_Renderer*  _pRenderer  = nullptr;
+      SDL_Texture*   _pTexture = nullptr;
+    };
 
 	}
 }

@@ -12,7 +12,7 @@ endif(WIN32)
 # The version number.
 set (Rgb2Hires_VERSION_MAJOR 1)
 set (Rgb2Hires_VERSION_MINOR 0)
-set(CMAKE_CXX_STANDARD 14)     
+set(CMAKE_CXX_STANDARD 17)     # required to use <filesystem>
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # dependencies

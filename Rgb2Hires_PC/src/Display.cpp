@@ -1,6 +1,9 @@
+#include <filesystem>
+#include <stdexcept>
 #include <iostream>
 #include <SDL.h>
 
+#include "Picture.h"
 #include "Display.h"
 
 
@@ -10,6 +13,123 @@ namespace RgbToHires
 {
   namespace Display
   {
+
+		//! @brief	 Output the colors from a 14-dot block
+		void UpdateHiResRGBCell(const int x, const uint8_t* pLineAddr, rgba8Bits_t* pOut);
+		std::unique_ptr<Screen> ComputeRgbBuffer(const uint8_t* hires);
+
+
+		Window* Window::S_pInstance = nullptr;
+
+		Window::~Window()
+		{
+			if (_pTexture != nullptr) {
+				SDL_DestroyTexture(_pTexture);
+			}
+			if (_pRenderer != nullptr) {
+				SDL_DestroyRenderer(_pRenderer);
+			}
+			if (_pWindow != nullptr) {
+				SDL_DestroyWindow(_pWindow);
+			}
+			SDL_Quit();
+		}
+
+		Window* Window::GetInstance()
+		{
+			if (S_pInstance == nullptr) {
+				S_pInstance = new Window;
+				S_pInstance->init();
+			}
+			return S_pInstance;
+		}
+
+
+		bool Window::init()
+		{
+			// init
+			if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+				sdlError("cannot initialise the preview window.");
+			}
+			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // nearest neighbor
+
+			// window
+			_pWindow = SDL_CreateWindow("Preview", SDL_WINDOWPOS_UNDEFINED,
+				SDL_WINDOWPOS_UNDEFINED,
+				560 * SCALE,
+				384 * SCALE,
+				SDL_WINDOW_SHOWN
+			);
+			if (_pWindow == nullptr) {
+				sdlError("cannot initialise the preview window.");
+			}
+			// renderer
+			_pRenderer = SDL_CreateRenderer(_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			if (_pRenderer == nullptr) {
+				sdlError("cannot initialise the preview window.");
+			}
+			// texture
+			_pTexture = SDL_CreateTexture(_pRenderer, SDL_PIXELFORMAT_BGR888, SDL_TEXTUREACCESS_STATIC, 560, 384);
+			if (_pTexture == nullptr) {
+				sdlError("cannot initialise the preview window.");
+			}
+
+			return true;
+		}
+
+		void Window::sdlError(const std::string& msg)
+		{
+			throw std::runtime_error{ "Error: " + msg };
+		}
+
+		void Window::display(const std::string& path, const uint8_t* hiresblob)
+		{		
+			bool isImgModified = false;
+			auto timeModified = std::filesystem::last_write_time(path);
+
+			{
+				auto pViewport = ComputeRgbBuffer(hiresblob);
+				SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+				SDL_RenderClear(_pRenderer);
+				SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
+				SDL_RenderPresent(_pRenderer);
+			}
+
+			// event loop
+			SDL_Event e;
+			while (true)
+			{
+
+				if (isImgModified)
+				{
+					// new modification time
+					timeModified = std::filesystem::last_write_time(path);
+
+					// update hires image
+					const auto imageRgb = Magick::Image{ path };
+					auto imageQuantized = ImageQuantized{ imageRgb };
+					const auto imageHiRes = Picture{ imageQuantized };
+
+					// rgb conversion from hires data
+					auto pViewport = ComputeRgbBuffer(imageHiRes.getBlob()->data());
+
+					// update the display with rgb data
+					SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+					SDL_RenderClear(_pRenderer);
+					SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
+					SDL_RenderPresent(_pRenderer);
+				}
+
+				if (SDL_WaitEventTimeout(&e, 250))
+				{
+					if (e.type == SDL_QUIT) { break; }
+				}
+
+				isImgModified = (timeModified != std::filesystem::last_write_time(path));
+
+			}
+
+		}
 
 		void SdlError(const std::string& error,
 			SDL_Window* const pWindow = nullptr,
@@ -29,14 +149,6 @@ namespace RgbToHires
 			exit(1);
 		}
 
-    struct rgba8Bits_t
-    {
-      uint8_t r = 0;
-      uint8_t g = 0;
-      uint8_t b = 0;
-      uint8_t a = 0xff;
-    };
-
 
 		constexpr std::array<rgba8Bits_t, 7> Palette = {
 			rgba8Bits_t{0x00,0x00,0x00, 0xFF}, // black
@@ -51,8 +163,7 @@ namespace RgbToHires
 
 		//===========================================================================
 // RGB videocards HGR
-
-		//! @brief	 Output the colors from a 14-dot block
+		
 		//! @details Adapted from AppleWin: https://github.com/AppleWin/AppleWin
 		//!					 A 14-dot block is used to draw a 7-pixel block (2 * 3.5-pixel blocks)
 		//!					 Each dot of a 3.5-pixel block can be delayed so we draw on 2 subdots.
@@ -60,7 +171,7 @@ namespace RgbToHires
 		//! @param	 x Vertical position of the 14-dot block 
 		//! @param   pLineAddr pointer to the start of the line
 		//! @param	 pOut pointer to the 28-subdot block to draw 
-		void UpdateHiResRGBCell(const int x, uint8_t* pLineAddr, rgba8Bits_t* pOut)
+		void UpdateHiResRGBCell(const int x, const uint8_t* pLineAddr, rgba8Bits_t* pOut)
 		{
 			const int xpixel = x * 14;
 			int xoffset = x & 1; // offset to start of the 2 bytes
@@ -133,13 +244,10 @@ namespace RgbToHires
 			}
 		}
 
-		void Display(uint8_t* blob)
+
+		std::unique_ptr<Screen> ComputeRgbBuffer(const uint8_t* hires)
 		{
-
-			using Block = std::array<rgba8Bits_t, 14>;
-			using Line = std::array<Block, 40>;
-			using Screen = std::array<Line, 192 * 2>;
-
+			// Getting a RGB framebuffer
 			// Converting line per line, pixel-block per pixel-block
 			auto pViewport = make_unique<Screen>();
 			auto itLine = std::begin(*pViewport);
@@ -147,65 +255,20 @@ namespace RgbToHires
 			{
 				for (const auto lineOffset : LineOffsets)
 				{
-					uint8_t* pHires = blob + lineBlockOffset + lineOffset;	// interleaved HIRES source line
+					const uint8_t* pHires = hires + lineBlockOffset + lineOffset;	// interleaved HIRES source line
 					for (std::size_t x = 0; x < itLine->size(); ++x)
 					{
 						auto& block = (*itLine)[x];
 						UpdateHiResRGBCell(static_cast<int>(x), pHires++, block.data());
-					}					
+					}
 					*(itLine + 1) = *itLine;	// Doubling the destination lines
 					itLine += 2;							// Next dest line
 				}
 			}
 
-			// Display with SDL
-			constexpr int scale = 1;
-			// init
-			if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-				SdlError("cannot initialise the preview window.");
-			}
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // nearest neighbor
-
-			// window
-			SDL_Window* pWindow = SDL_CreateWindow("Preview", SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED,
-				560 * scale,
-				384 * scale,
-				SDL_WINDOW_SHOWN
-			);
-			if (pWindow == nullptr) {
-				SdlError("cannot initialise the preview window.");
-			}
-			// renderer
-			SDL_Renderer* pRenderer = SDL_CreateRenderer(pWindow, -1, SDL_RENDERER_ACCELERATED);
-			if (pRenderer == nullptr) {
-				SdlError("cannot initialise the preview window.", pWindow);
-			}
-			// texture
-			SDL_Texture* pTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_BGR888, SDL_TEXTUREACCESS_STATIC, 560, 384);
-			if (pTexture == nullptr) {
-				SdlError("cannot initialise the preview window.", pWindow, pRenderer);
-			}
-			// display
-			SDL_UpdateTexture(pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
-			SDL_RenderClear(pRenderer);
-			SDL_RenderCopy(pRenderer, pTexture, NULL, NULL);
-			SDL_RenderPresent(pRenderer);
-			// event loop
-			while (true)
-			{
-				SDL_Event e;
-				if (SDL_WaitEvent(&e))
-				{
-					if (e.type == SDL_QUIT) { break; }
-				}
-			}
-			// free
-			SDL_DestroyTexture(pTexture);
-			SDL_DestroyRenderer(pRenderer);
-			SDL_DestroyWindow(pWindow);
-			SDL_Quit();
+			return pViewport;
 		}
+
 
   }
 }
