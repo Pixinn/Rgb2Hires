@@ -90,9 +90,23 @@ namespace RgbToHires {
 
 	double ImageQuantized::Distance(const Magick::Color& color1, const Magick::Color& color2)
 	{
-		return	  pow(color1.redQuantum() - color2.redQuantum(), 2) \
-			    + pow(color1.greenQuantum() - color2.greenQuantum(), 2) \
-			    + pow(color1.blueQuantum() - color2.blueQuantum(), 2);
+
+		static constexpr double LUMA_RED = 0.299;
+		static constexpr double LUMA_GREEN = 0.587;
+		static constexpr double LUMA_BLUE = 0.114;
+
+		const auto y1 = LUMA_RED * color1.redQuantum() + LUMA_GREEN * color1.greenQuantum() + LUMA_BLUE * color1.blueQuantum();
+		const auto u1 = 0.492 * (color1.blueQuantum() - y1);
+		const auto v1 = 0.877 * (color1.redQuantum() - y1);
+		const auto y2 = LUMA_RED * color2.redQuantum() + LUMA_GREEN * color2.greenQuantum() + LUMA_BLUE * color2.blueQuantum();
+		const auto u2 = 0.492 * (color2.blueQuantum() - y2);
+		const auto v2 = 0.877 * (color2.redQuantum() - y2);
+
+		const auto dy = (y1 - y2);
+		const auto du = (u1 - u2);
+		const auto dv = (v1 - v2);
+
+		return (dy * dy + du * du + dv * dv);
 	}
 
 

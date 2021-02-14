@@ -27,13 +27,14 @@
 
 namespace RgbToHires {
 
+	constexpr std::size_t SHIFT = sizeof(Magick::Quantum)*8 - 8;
 
-	#define WHITE Magick::Color{"white"}
-	#define BLACK Magick::Color{"black"}
-	#define BLUE Magick::Color{"blue"}
-	#define GREEN Magick::Color{"green"}
-	#define ORANGE Magick::Color{"orange"}
-	#define VIOLET Magick::Color{"purple"}
+	#define WHITE Magick::Color{0xFF << SHIFT, 0xFF << SHIFT, 0xFF << SHIFT}
+	#define BLACK Magick::Color{0x00 << SHIFT, 0x00 << SHIFT, 0x00 << SHIFT}
+	#define BLUE Magick::Color{0x07 << SHIFT, 0xA8 << SHIFT, 0xE0 << SHIFT}
+	#define GREEN Magick::Color{0x43 << SHIFT, 0xC8 << SHIFT, 0x00 << SHIFT}
+	#define ORANGE Magick::Color{0xF9 << SHIFT, 0x56 << SHIFT,0x1D << SHIFT}
+	#define VIOLET Magick::Color{0xBB << SHIFT, 0x36 << SHIFT, 0xFF << SHIFT}
 
 
 	constexpr unsigned WIDTH = 140u;
