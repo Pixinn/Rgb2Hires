@@ -63,7 +63,8 @@ namespace RgbToHires
 		/// @brief color group as defined in Apple's documentation
 		enum eColorGroup {
 			GROUP_1,
-			GROUP_2
+			GROUP_2,
+			UNDEF	// black and white can be group1 or group2
 		};
 		/// @brief Returns the color group of these two 3.5 pixel blocks
 		std::pair<eColorGroup, eColorGroup> getGroup(const BlockPixel&) const;

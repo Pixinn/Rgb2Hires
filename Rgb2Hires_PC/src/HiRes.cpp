@@ -58,10 +58,11 @@ namespace RgbToHires {
 
 	pair<BlockHr::eColorGroup, BlockHr::eColorGroup> BlockHr::getGroup(const BlockPixel& block) const
 	{
-		pair<eColorGroup, eColorGroup> groups{ GROUP_1, GROUP_1 };
+		pair<eColorGroup, eColorGroup> groups{ UNDEF, UNDEF };
 		//1st block group, including the last semi-pixel
 		for (auto i = 0u; i < 4u; ++i) {
 			if (block[i] == GREEN || block[i] == VIOLET) {
+				groups.first = GROUP_1;
 				break;
 			}
 			else if (block[i] == ORANGE || block[i] == BLUE) {
@@ -72,12 +73,24 @@ namespace RgbToHires {
 		//2nd block group, excluding the first semi-pixel
 		for (auto i = 4u; i < 7u; ++i) {
 			if (block[i] == GREEN || block[i] == VIOLET) {
+				groups.second = GROUP_1;
 				break;
 			}
 			else if (block[i] == ORANGE || block[i] == BLUE) {
 				groups.second = GROUP_2;
 				break;
 			}
+		}
+		// if only black or white pixel: groups are still undefined
+		if (groups.first == UNDEF) { // 1st 3.5-pixels were black or white
+			groups.first = groups.second;
+		}
+		if (groups.second == UNDEF) { // 2nd 35-pixels were black or white
+			groups.second = groups.first;
+		}
+		if (groups.first == UNDEF) { // all the 7-pixels were black or white
+			groups.first = GROUP_1;
+			groups.second = GROUP_1;
 		}
 		return groups;
 	}
