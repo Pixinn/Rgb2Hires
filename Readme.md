@@ -2,7 +2,7 @@
 
 This repository contains three "PC" projects:
 * **libRgb2Hires**: a library to convert RGB image to the Apple II's HIRES format
-* **Picture**: a program to convert a RGB png to a binary or an ASM excerpt, that can be loaded to the HIRES memory pages of an Apple II.
+* **Picture**: a program to convert a RGB png to a binary or an ASM excerpt, that can be loaded to the HIRES memory pages of an Apple II. An optional **live preview** can be displayed: its window will simulate an RGB monitor and will show the result, including color clashing and artifacts.
   * Source image must be 140x192. Pixels are anamorphic: they will be displayed twice wider than tall.
   * Source image must contains six colors : BLACK, WHITE, ORANGE, GREEN, BLUE and PURPLE. The color may be approximation of the Apple II 6 colors. Please refer to the provided pic.
 * **Tile**: given a RGB png tile sheet that satisfies the same requirements as above, it extracts a 14x16 tile and converts it to ASM data. This data **is not interleaved**.
@@ -16,14 +16,19 @@ __Note:__ For more information about the "Hires" format and its limitations, you
 ## Windows / Linux projects (libHires, Picture, Tile)
 ### Dependencies
 
-* Magick++, from ImageMagick 6
-    * On Windows
-      * Download ImageMagick 6 from the [official website](https://legacy.imagemagick.org/script/install-source.php)
-      * Compile it in *Dynamic Multithreaded*
-      * Provide an environment variable called *MAGICK_HOME* and pointing to the root ImageMagick folder.
-      * Copy *ImageMagick-config* from the *script/* folder to *MAGICK_HOME*
-    * On Linux, install libmagick++-dev for version 6
-	  > sudo apt install libmagick++-6.q16-dev
+* **Magick++** from ImageMagick 6 and **SDL2**
+    * On **Windows**
+      * ImageMagick
+		   * Download ImageMagick 6 from the [official website](https://legacy.imagemagick.org/script/install-source.php).
+		   * Compile it in *Dynamic Multithreaded*.
+		   * Provide an environment variable called *MAGICK_HOME* and pointing to the root ImageMagick folder.
+		   * Copy *ImageMagick-config* from the *script/* folder to *MAGICK_HOME*.
+	  * SDL2
+	    * Download the latest version of the *development library* from the [official website](https://www.libsdl.org/download-2.0.php) and unarchive it.
+		 * Provide an environment variable called *SDL2_HOME* and pointing to the root of the SDL2 library.
+
+    * On **Linux**, install libmagick++-dev for version 6 and libsdl2-dev
+	  > sudo apt install libmagick++-6.q16-dev libsdl2-dev
 
 ### How to build
 
@@ -49,3 +54,13 @@ __Note:__ For more information about the "Hires" format and its limitations, you
 ## Test
 
 A correct source image, *test.png*, is provided as an example. Convert it using Picture, then copy it on a dsk image along with the Apple II loader. You can use or refer to the provided script in the *Loader_Apple2* folder.
+
+### Demo
+
+The live preview can help to visualise color clashing and artifacts. You can edit your file using *Photoshop* or any other application. The *Preview* window will be ubdated each tile the file is saved.
+
+<video controls width="720">
+    <source src="https://pub.xtof.info/github/demo-rgb2hires.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
