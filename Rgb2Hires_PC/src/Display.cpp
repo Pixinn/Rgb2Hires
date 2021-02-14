@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <iostream>
+#include <chrono>
 #include <SDL.h>
 
 #include "Picture.h"
@@ -23,6 +24,13 @@ namespace RgbToHires
 
 		Window::~Window()
 		{
+			if (_pThread != nullptr) {
+				if (_pThread->joinable()) {
+					_stopFileSurvey.store(true);
+					_pThread->join();
+				}
+				delete _pThread;
+			}
 			if (_pTexture != nullptr) {
 				SDL_DestroyTexture(_pTexture);
 			}
@@ -84,9 +92,6 @@ namespace RgbToHires
 
 		void Window::display(const std::string& path, const uint8_t* hiresblob)
 		{		
-			bool isImgModified = false;
-			auto timeModified = std::filesystem::last_write_time(path);
-
 			{
 				auto pViewport = ComputeRgbBuffer(hiresblob);
 				SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
@@ -95,16 +100,27 @@ namespace RgbToHires
 				SDL_RenderPresent(_pRenderer);
 			}
 
+			// launch thread to survey file modifications
+			_pThread = new std::thread([this, path] {	// freed in ~Window()
+				auto timeModified = std::filesystem::last_write_time(path);
+				while (!this->_stopFileSurvey.load())
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					const bool isImgModified(timeModified != std::filesystem::last_write_time(path));					
+					if (isImgModified) {
+						timeModified = std::filesystem::last_write_time(path);
+						this->_isFileModified.store(isImgModified);
+					}
+				}
+			});
+			_pThread->detach();
+
 			// event loop
 			SDL_Event e;
 			while (true)
 			{
-
-				if (isImgModified)
+				if (_isFileModified.load())
 				{
-					// new modification time
-					timeModified = std::filesystem::last_write_time(path);
-
 					// update hires image
 					const auto imageRgb = Magick::Image{ path };
 					auto imageQuantized = ImageQuantized{ imageRgb };
@@ -124,9 +140,6 @@ namespace RgbToHires
 				{
 					if (e.type == SDL_QUIT) { break; }
 				}
-
-				isImgModified = (timeModified != std::filesystem::last_write_time(path));
-
 			}
 
 		}

@@ -18,6 +18,8 @@
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
 
+#include <thread>
+
 #include "ImageQuantized.h"
 #include "HiRes.h"
 
@@ -55,6 +57,10 @@ namespace RgbToHires
     private:
       bool init();
       void sdlError(const std::string& msg);
+
+      std::thread* _pThread = nullptr; //< to survey filechange
+      std::atomic_bool _isFileModified = false;
+      std::atomic_bool _stopFileSurvey = false;
 
       static Window* S_pInstance;
       static const int SCALE = 2;
