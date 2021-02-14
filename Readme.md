@@ -59,8 +59,6 @@ A correct source image, *test.png*, is provided as an example. Convert it using 
 
 The live preview can help to visualise color clashing and artifacts. You can edit your file using *Photoshop* or any other application. The *Preview* window will be ubdated each tile the file is saved.
 
-<video controls width="720">
-    <source src="https://pub.xtof.info/github/demo-rgb2hires.mp4"
-            type="video/mp4">
-    Sorry, your browser doesn't support embedded videos.
-</video>
+<a href="https://pub.xtof.info/github/demo-rgb2hires.mp4">
+<img src="https://pub.xtof.info/github/demo-rgb2hires.png"/>
+</a>
