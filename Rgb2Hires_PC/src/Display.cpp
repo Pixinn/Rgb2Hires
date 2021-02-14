@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <chrono>
+
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
 
 #include "Picture.h"
@@ -175,7 +177,7 @@ namespace RgbToHires
 
 
 		//===========================================================================
-// RGB videocards HGR
+		// RGB videocards HGR
 		
 		//! @details Adapted from AppleWin: https://github.com/AppleWin/AppleWin
 		//!					 A 14-dot block is used to draw a 7-pixel block (2 * 3.5-pixel blocks)

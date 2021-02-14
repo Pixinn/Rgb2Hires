@@ -31,6 +31,7 @@ else()
 	find_package(ImageMagick 6.9 EXACT REQUIRED COMPONENTS Magick++ )
 endif(WIN32)
 find_package(SDL2 REQUIRED)
+find_package(Threads REQUIRED)
 
 # directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin/debug)
@@ -55,9 +56,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${ImageMagick_INCLUDE_DIRS} $
 
 # Application Picture
 add_executable(Picture src/App_Picture.cpp)
+if(NOT WIN32)
+		set_target_properties(Picture PROPERTIES COMPILE_FLAGS -pthread LINK_FLAGS -pthread)
+endif()
 target_compile_definitions(Picture PUBLIC MAGICKCORE_QUANTUM_DEPTH=16 MAGICKCORE_HDRI_ENABLE=0)
 target_include_directories(Picture PRIVATE src ${ImageMagick_INCLUDE_DIRS})
-target_link_libraries(Picture ${ImageMagick_LIBRARIES} ${SDL2_LIBRARIES} ${PROJECT_NAME})    
+target_link_libraries(Picture ${ImageMagick_LIBRARIES}  ${CMAKE_THREAD_LIBS_INIT} ${PROJECT_NAME} ${SDL2_LIBRARIES})  # SDL2 must be at the end
 set_property(TARGET Picture PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
 
 # Application Tile

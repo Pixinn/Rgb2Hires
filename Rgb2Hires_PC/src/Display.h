@@ -19,6 +19,7 @@
 #define _DISPLAY_H_
 
 #include <thread>
+#include <atomic>
 
 #include "ImageQuantized.h"
 #include "HiRes.h"
