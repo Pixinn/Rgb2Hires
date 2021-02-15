@@ -47,7 +47,7 @@ int main( int argc, char *argv[] )
     Magick::InitializeMagick(*argv);
 
 	//Parsing command line
-	TCLAP::CmdLine cmd("Picture", ' ', "0");
+	TCLAP::CmdLine cmd("Picture - by Christophe Meneboeuf <christophe@xtof.info>", ' ', "0");
 	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "path_to_image");
 	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "path_to_output");
 	TCLAP::SwitchArg assembly("a", "asm", "Output asm format");
@@ -59,7 +59,7 @@ int main( int argc, char *argv[] )
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
-		std::cout << "No input or output path privided.";
+		std::cout << "No input or output path provided." << std::endl;
 		return -1;
 	}
 

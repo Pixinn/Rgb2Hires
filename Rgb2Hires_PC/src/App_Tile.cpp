@@ -46,7 +46,7 @@ int main( int argc, char *argv[] )
     Magick::InitializeMagick(*argv);
 
 	//Parsing command line
-	TCLAP::CmdLine cmd("Tile", ' ', "0");
+	TCLAP::CmdLine cmd("Tile - by Christophe Meneboeuf <christophe@xtof.info>", ' ', "0");
 	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "string");
 	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "string");
 	TCLAP::ValueArg<unsigned> column("c", "column", "Column number in the tile sheet. Starts at 0.", true, 0u, "integer");
@@ -58,15 +58,15 @@ int main( int argc, char *argv[] )
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
-		std::cout << "No input or output path privided.";
+		std::cout << "No input or output path provided." << std::endl;
 		return -1;
 	}
 	if (column.getValue() > 9) {
-		std::cout << "Column number shall be < 9";
+		std::cout << "Column number shall be < 9" << std::endl;
 		return -1;
 	}
 	if (line.getValue() > 11) {
-		std::cout << "Line number shall be < 11";
+		std::cout << "Line number shall be < 11" << std::endl;
 		return -1;
 	}
 

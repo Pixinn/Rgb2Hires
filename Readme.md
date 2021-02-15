@@ -1,5 +1,22 @@
 # Rgb2Hires
 
+Rgb2Hires is a set of tools to help converting a modern RGB image (JPEG, PNG) to the HIRES format for Apple II computers ; either as a binary export or an assembly listing.
+
+The color of the RGB imlage can be approximative: Rgb2Hires will match them with the nearest HIRES color.
+
+## Apple II colors
+
+RGB values of the targeted colors:
+
+* **BLACK**:  00 00 00
+* **WHITE**:  FF FF FF
+* **BLUE**:   07 A8 E0
+* **ORANGE**: F9 56 1D
+* **GREEN**:  43 C8 00
+* **VIOLET**: BB 36 FF
+
+## Projects
+
 This repository contains three "PC" projects:
 * **libRgb2Hires**: a library to convert RGB image to the Apple II's HIRES format
 * **Picture**: a program to convert a RGB png to a binary or an ASM excerpt, that can be loaded to the HIRES memory pages of an Apple II. An optional **live preview** can be displayed: its window will simulate an RGB monitor and will show the result, including color clashing and artifacts.
@@ -13,7 +30,9 @@ And one Apple II project:
 __Note:__ For more information about the "Hires" format and its limitations, you can refer to my [website](https://www.xtof.info/hires-graphics-apple-ii.html).
 
 
-## Windows / Linux projects (libHires, Picture, Tile)
+## Build from sources
+
+This project has been tested with VisualStudio 2019, Gcc 9 (Ubuntu 20.04) and Gcc8.3.0 (Debian 10).
 ### Dependencies
 
 * **Magick++** from ImageMagick 6 and **SDL2**
@@ -28,7 +47,14 @@ __Note:__ For more information about the "Hires" format and its limitations, you
 		 * Provide an environment variable called *SDL2_HOME* and pointing to the root of the SDL2 library.
 
     * On **Linux**, install libmagick++-dev for version 6 and libsdl2-dev
-	  > sudo apt install libmagick++-6.q16-dev libsdl2-dev
+	    
+      > sudo apt install libmagick++-6.q16-dev libsdl2-dev
+      
+      Depending on your Linux distribution, you may have to set an environment variable *sdl2_DIR*, pointing to the directory hosting SDL2's cmake configuration, before running cmake.
+
+      Example on Debian:
+
+      > export sdl2_DIR=/usr/lib/x86_64-linux-gnu/cmake/SDL2/
 
 ### How to build
 

@@ -13,7 +13,9 @@ endif(WIN32)
 set (Rgb2Hires_VERSION_MAJOR 1)
 set (Rgb2Hires_VERSION_MINOR 0)
 set(CMAKE_CXX_STANDARD 17)     # required to use <filesystem>
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
+
 
 # dependencies
 if(WIN32)	
@@ -21,16 +23,16 @@ if(WIN32)
 	if(NOT DEFINED ENV{SDL2_HOME})
 		message(FATAL_ERROR "Please set a SDL2_HOME environment variable to the root directory of SDL2")		
 	endif()
-	set(SDL2_DIR $ENV{SDL2_HOME})
+	set(sdl2_DIR $ENV{SDL2_HOME})
 	# imagemagik
 	if(NOT DEFINED ENV{MAGICK_HOME})
 		message(FATAL_ERROR "Please set a MAGICK_HOME environment variable to the root directory of ImageMagick6")		
 	endif()
 	find_package(ImageMagick HINTS $ENV{MAGICK_HOME} REQUIRED COMPONENTS Magick++)
 else()
-	find_package(ImageMagick 6.9 EXACT REQUIRED COMPONENTS Magick++ )
+	find_package(ImageMagick REQUIRED COMPONENTS Magick++ )
 endif(WIN32)
-find_package(SDL2 REQUIRED)
+find_package(sdl2 REQUIRED)
 find_package(Threads REQUIRED)
 
 # directories
@@ -62,6 +64,9 @@ endif()
 target_compile_definitions(Picture PUBLIC MAGICKCORE_QUANTUM_DEPTH=16 MAGICKCORE_HDRI_ENABLE=0)
 target_include_directories(Picture PRIVATE src ${ImageMagick_INCLUDE_DIRS})
 target_link_libraries(Picture ${ImageMagick_LIBRARIES}  ${CMAKE_THREAD_LIBS_INIT} ${PROJECT_NAME} ${SDL2_LIBRARIES})  # SDL2 must be at the end
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9")
+	target_link_libraries(Picture stdc++fs) # filesystem lib not included in stdc++ for gcc < 9
+endif()
 set_property(TARGET Picture PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
 
 # Application Tile
