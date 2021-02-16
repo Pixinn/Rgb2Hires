@@ -20,6 +20,7 @@
 
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 #include "ImageQuantized.h"
 #include "HiRes.h"
@@ -60,6 +61,7 @@ namespace RgbToHires
       void sdlError(const std::string& msg);
 
       std::thread* _pThread = nullptr; //< to survey filechange
+      std::mutex   _mutex;
       std::atomic_bool _isFileModified = false;
       std::atomic_bool _stopFileSurvey = false;
 

@@ -94,27 +94,61 @@ namespace RgbToHires
 
 		void Window::display(const std::string& path, const uint8_t* hiresblob)
 		{		
-			{
-				auto pViewport = ComputeRgbBuffer(hiresblob);
-				SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
-				SDL_RenderClear(_pRenderer);
-				SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
-				SDL_RenderPresent(_pRenderer);
-			}
+
+			struct {
+				bool happened = false;
+				std::string what;
+			} error;
+
+			auto pViewport = ComputeRgbBuffer(hiresblob);
+			SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+			SDL_RenderClear(_pRenderer);
+			SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
+			SDL_RenderPresent(_pRenderer);
 
 			// launch thread to survey file modifications
-			_pThread = new std::thread([this, path] {	// freed in ~Window()
+			_pThread = new std::thread( [this, &path, &pViewport, &error]  // freed in ~Window()
+			{	
 				auto timeModified = std::filesystem::last_write_time(path);
 				while (!this->_stopFileSurvey.load())
 				{
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 					const bool isImgModified(timeModified != std::filesystem::last_write_time(path));					
-					if (isImgModified) {
-						timeModified = std::filesystem::last_write_time(path);
-						this->_isFileModified.store(isImgModified);
+					if (isImgModified)
+					{
+						bool isDone = false;
+						int nbErrors = 0;
+						while (!isDone) // several attempts as the file may be marked modified before being written
+						{
+							try
+							{
+								this_thread::sleep_for(std::chrono::milliseconds(500)); // 500ms between each attempt
+								// update hires image
+								const auto imageRgb = Magick::Image{ path };
+								auto imageQuantized = ImageQuantized{ imageRgb };
+								const auto imageHiRes = Picture{ imageQuantized };
+
+								// rgb conversion from hires data
+								std::lock_guard<std::mutex> lock{ this->_mutex }; // protecting pViewport
+								pViewport = ComputeRgbBuffer(imageHiRes.getBlob()->data());								
+								isDone = true;
+								timeModified = std::filesystem::last_write_time(path);
+								this->_isFileModified.store(isImgModified);
+							}
+							catch (Magick::Error& e)
+							{
+								++nbErrors;
+								if (nbErrors >= 5) { // 5 atttemps
+									isDone = true;
+									error.happened = true;
+									error.what = e.what();
+									this->_stopFileSurvey.store(true);
+								}
+							}
+						}
 					}
 				}
-			});
+			}); // thread
 			_pThread->detach();
 
 			// event loop
@@ -123,24 +157,23 @@ namespace RgbToHires
 			{
 				if (_isFileModified.load())
 				{
-					// update hires image
-					const auto imageRgb = Magick::Image{ path };
-					auto imageQuantized = ImageQuantized{ imageRgb };
-					const auto imageHiRes = Picture{ imageQuantized };
-
-					// rgb conversion from hires data
-					auto pViewport = ComputeRgbBuffer(imageHiRes.getBlob()->data());
-
 					// update the display with rgb data
-					SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+					{
+						std::lock_guard<std::mutex> lock{ this->_mutex }; // protecting pViewport
+						SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+					}
 					SDL_RenderClear(_pRenderer);
 					SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
 					SDL_RenderPresent(_pRenderer);
 				}
 
-				if (SDL_WaitEventTimeout(&e, 250))
+				if (SDL_WaitEventTimeout(&e, 100))
 				{
 					if (e.type == SDL_QUIT) { break; }
+				}
+
+				if (error.happened) {
+					throw std::runtime_error{ error.what };
 				}
 			}
 
