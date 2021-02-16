@@ -82,8 +82,10 @@ int main( int argc, char *argv[] )
 			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
 		}
 
-		const auto bytes = imageHiRes.getBlob();
-		Display::Window::GetInstance()->display(filepath, bytes->data());
+		if (preview.getValue()) {
+			const auto bytes = imageHiRes.getBlob();
+			Display::Window::GetInstance()->display(filepath, bytes->data());
+		}
 
 	}
 
