@@ -31,6 +31,11 @@
 namespace RgbToHires
 {
 
+
+	static constexpr unsigned NB_PIXEL_PER_BLOCK = 7u;
+	static constexpr unsigned NB_BLOCK_PER_LINE = 20u;
+	static constexpr unsigned NB_LINES_PER_SCREEN = 192u;
+
 	constexpr std::array<const uint16_t, 192 / 8> LineAdresses = {
 		 0x0000, 0x0080, 0x0100, 0x0180, 0x0200, 0x0280, 0x0300, 0x0380,
 		 0x0028, 0x00a8, 0x0128, 0x01a8, 0x0228, 0x02a8, 0x0328, 0x03a8,
@@ -41,7 +46,7 @@ namespace RgbToHires
 	0x0, 0x400, 0x800, 0xc00, 0x1000, 0x1400, 0x1800, 0x1c00
 	};
 
-	using BlockPixel = std::array<Magick::PixelPacket, 7u>;
+	using BlockPixel = std::array<Color, 7u>;
 	
 	/// @brief A block of 7 pixels
 	class BlockHr
@@ -69,7 +74,7 @@ namespace RgbToHires
 		/// @brief Returns the color group of these two 3.5 pixel blocks
 		std::pair<eColorGroup, eColorGroup> getGroup(const BlockPixel&) const;
 		/// @brief Returns the bit pait corresponding to the given color
-		uint8_t getDibit(const Magick::Color&) const;
+		uint8_t getDibit(const Color&) const;
 
 		std::array<uint8_t, 2> _data;
 	};

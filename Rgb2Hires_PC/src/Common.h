@@ -20,25 +20,32 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-
-#include <Magick++.h>
-
-#define MAGICKCORE_ZERO_CONFIGURATION_SUPPORT 1
+#include <cstdint>
+#include <SDL2/SDL.h>
 
 namespace RgbToHires {
 
-	constexpr std::size_t SHIFT = sizeof(Magick::Quantum)*8 - 8;
+  struct Color : public SDL_Color
+  {
+    inline bool operator==(const Color& rhs) const
+    {
+      return r == rhs.r && g == rhs.g && b == rhs.b;
+    }
+    inline bool operator==(const SDL_Color& rhs) const
+    {
+      return r == rhs.r && g == rhs.g && b == rhs.b;
+    }
+  };
 
-	#define WHITE Magick::Color{0xFF << SHIFT, 0xFF << SHIFT, 0xFF << SHIFT}
-	#define BLACK Magick::Color{0x00 << SHIFT, 0x00 << SHIFT, 0x00 << SHIFT}
-	#define BLUE Magick::Color{0x07 << SHIFT, 0xA8 << SHIFT, 0xE0 << SHIFT}
-	#define GREEN Magick::Color{0x43 << SHIFT, 0xC8 << SHIFT, 0x00 << SHIFT}
-	#define ORANGE Magick::Color{0xF9 << SHIFT, 0x56 << SHIFT,0x1D << SHIFT}
-	#define VIOLET Magick::Color{0xBB << SHIFT, 0x36 << SHIFT, 0xFF << SHIFT}
+constexpr Color WHITE {0xFF, 0xFF, 0xFF, 0xFF};
+constexpr Color BLACK {0x00, 0x00, 0x00, 0xFF};
+constexpr Color BLUE  {0x07, 0xA8, 0xE0, 0xFF};
+constexpr Color GREEN {0x43, 0xC8, 0x00, 0xFF};
+constexpr Color ORANGE{0xF9, 0x56, 0x1D, 0xFF};
+constexpr Color VIOLET{0xBB, 0x36, 0xFF, 0xFF};
 
-
-	constexpr unsigned WIDTH = 140u;
-	constexpr unsigned HEIGHT = 192u;
+constexpr unsigned WIDTH = 140u;
+constexpr unsigned HEIGHT = 192u;
 
 }
 

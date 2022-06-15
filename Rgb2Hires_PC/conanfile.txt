@@ -1,0 +1,8 @@
+[requires]
+sdl/2.0.20
+sdl_image/2.0.5
+tclap/1.2.4
+
+[generators]
+cmake
+

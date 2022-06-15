@@ -18,6 +18,8 @@
 #ifndef _PICTURE_H_
 #define _PICTURE_H_
 
+#include <map>
+
 #include "ImageQuantized.h"
 #include "HiRes.h"
 
@@ -46,7 +48,7 @@ namespace RgbToHires
 		using LineHr = std::vector<BlockHr>;
 		using Blob = std::array<LineHr, NB_LINES_PER_SCREEN>;
 
-		Blob    _blob;	///< A frame ordered buffer of hires data		
+		Blob    _blobRgb;	///< A frame ordered buffer of hires data		
 		std::map<const uint16_t, const LineHr*> _hrOrderedLines; ///< map<adress,line's data>
 	};
 

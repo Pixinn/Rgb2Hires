@@ -23,13 +23,13 @@
 #include <string>
 #include <sys/stat.h>
 
-#include <Magick++.h>
+#include <SDL2/SDL_image.h>
 #include <tclap/CmdLine.h>
 
 #include "ImageQuantized.h"
-#include "Picture.h"
-#include "Tile.h"
-#include "Display.h"
+//#include "Picture.h"
+//#include "Tile.h"
+//#include "Display.h"
 
 using namespace std;
 using namespace RgbToHires;
@@ -41,10 +41,39 @@ inline bool exists(const std::string& path)
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
+void ExitOnError(const std::string& message,
+	std::vector<SDL_Surface*> surfaces = {})
+{
+	std::cout << "Error\n" << message << '\n';
+
+	for (auto surface : surfaces)
+	{
+		SDL_FreeSurface(surface);
+	}
+
+	SDL_Quit();
+	IMG_Quit();
+	exit(-1);
+}
+
+
 /// @brief Program entry point
 int main( int argc, char *argv[] )
 {
-    Magick::InitializeMagick(*argv);
+
+	// Init
+	int inited = IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+	if (inited != (IMG_INIT_JPG | IMG_INIT_PNG))
+	{
+		std::cerr << "IMG_Init: Failed to init required jpg and png support!\n"
+		          << "IMG_Init: " <<  IMG_GetError() << '\n';
+		return -1;
+	}
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		std::cerr << "There was an error initing SDL2: " << SDL_GetError() << std::endl;
+		return -1;
+	}
 
 	//Parsing command line
 	TCLAP::CmdLine cmd("Picture - by Christophe Meneboeuf <christophe@xtof.info>", ' ', "0");
@@ -59,41 +88,48 @@ int main( int argc, char *argv[] )
 	cmd.parse(argc, argv);
 
 	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
-		std::cout << "No input or output path provided." << std::endl;
+		std::cout << "No input or output path provided." << std::endl;				
+		IMG_Quit();
 		return -1;
 	}
 
-	try
-	{        
-		const auto filepath = imagePath.getValue();
-		if (!exists(filepath)) {
-			throw runtime_error("Cannot read " + filepath);
-		}
-		const auto imageRgb = Magick::Image{ filepath };
-		auto imageQuantized = ImageQuantized{ imageRgb };
-		const auto imageHiRes = Picture{ imageQuantized };	
-		if (assembly.getValue() == true) {    //Ouput in ASM
-			ofstream output(outputPath.getValue());
-			output << imageHiRes.getAsm();
-		}
-		else {	//Binary output
-			ofstream output(outputPath.getValue(), ios::binary);
-			const auto bytes = imageHiRes.getBlob();
-			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
-		}
-
-		if (preview.getValue()) {
-			const auto bytes = imageHiRes.getBlob();
-			Display::Window::GetInstance()->display(filepath, bytes->data());
-		}
-
+    
+	const auto filepath = imagePath.getValue();
+	if (!exists(filepath)) {
+		ExitOnError("Cannot read " + filepath);
 	}
 
-	//Fatal error
-	catch (const exception& e) {
-		cout << e.what();
-		return -1;
+	std::vector<SDL_Surface*> surfaces;
+	SDL_Surface* surfaceRgb = IMG_Load(filepath.c_str());
+	surfaces.push_back(surfaceRgb);
+	if (surfaceRgb == nullptr)
+	{
+		ExitOnError("Cannot decode " + filepath, surfaces);
 	}
+	const ImageQuantized imageHiRes{ surfaceRgb };
+
+	if (assembly.getValue() == true) {    //Ouput in ASM
+		ofstream output(outputPath.getValue());
+		output << imageHiRes.getAsm();
+	}
+	else {	//Binary output
+		ofstream output(outputPath.getValue(), ios::binary);
+		const auto bytes = imageHiRes.getBlob();
+		output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
+	}
+
+	//if (preview.getValue()) {
+	//	const auto bytes = imageHiRes.getBlob();
+	//	Display::Window::GetInstance()->display(filepath, bytes->data());
+	//}
+
+	for (auto surface : surfaces)
+	{
+		SDL_FreeSurface(surface);
+	}
+
+	SDL_Quit();
+	IMG_Quit();
 
     return 0;
 }

@@ -22,32 +22,49 @@
 
 #include <memory>
 #include <array>
-#include "Common.h"
+#include <map>
+#include <string>
 
+#include "Common.h"
+#include "HiRes.h"
 
 namespace RgbToHires {
 
     /// @brief Image quantized to the HIRES colors.
     /// @details Quantization works with a nearest distance algorithm.
-	class ImageQuantized :
-		public Magick::Image
+	class ImageQuantized
 	{
 	public:
 
-		using Block = std::array<Magick::PixelPacket,7>;
-		using Line = std::array<Block, 20>;
-		using Blob = std::array<Line, 192>;
+		// rgb
+		using BlockRgb = std::array<Color, NB_PIXEL_PER_BLOCK>;
+		using Line = std::array<BlockRgb, NB_BLOCK_PER_LINE>;
+		using BlobRgb = std::array<Line, NB_LINES_PER_SCREEN>;
+		// hires
+		using LineHr = std::vector<BlockHr>;
+		using BlobHr = std::array<LineHr, NB_LINES_PER_SCREEN>;
 
-		ImageQuantized(const Magick::Image& src);
-		~ImageQuantized()=default;
+		static constexpr unsigned FRAME_SIZE = 192 * 40 + 512; ///< Frame size in byte
 
-        /// @brief Returns an array of bytes forming the RGB quantized image
-		std::unique_ptr<Blob> getBlob() const;
+		ImageQuantized(SDL_Surface* const source);
+		~ImageQuantized() = default;
+
+
+		/// @brief Returns the binary hires picture
+		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getBlob() const;
+		/// @brief Returns asm code corresponding to the image in memory (CA65 format)
+		std::string getAsm() const;
 
 	private:
-        /// @brief Computes the euclidian distance between two colors
-		double Distance(const Magick::Color&, const Magick::Color&);
+		Color Quantize(const Color& color);
+    /// @brief Computes the euclidian distance between two colors
+		double Distance(const Color&, const Color&);
 
+
+	private:
+		const  SDL_PixelFormatEnum _format;
+		BlobHr  _blobHr;
+		std::map<const uint16_t, const LineHr*> _hrOrderedLines; ///< map<adress,line's data>
 	};
 
 }

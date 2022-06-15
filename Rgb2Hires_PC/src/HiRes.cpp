@@ -17,7 +17,7 @@
 */
 
 #include <stdexcept>
-#include "ImageQuantized.h"
+//#include "ImageQuantized.h"
 #include "HiRes.h"
 
 
@@ -96,7 +96,7 @@ namespace RgbToHires {
 	}
 
 
-	uint8_t BlockHr::getDibit(const Magick::Color& color) const
+	uint8_t BlockHr::getDibit(const Color& color) const
 	{
 		if (color == WHITE) {
 			return 3;
@@ -112,7 +112,7 @@ namespace RgbToHires {
 		}
 		else {
 			auto msg = string("Unsupported color used as input for hires pixel\nRGB:");
-			msg = msg +	to_string(color.redQuantum()) + to_string(color.greenQuantum()) + to_string(color.blueQuantum());
+			msg = msg +	to_string(color.r) + to_string(color.g) + to_string(color.b);
 			throw(runtime_error(msg));
 		}
 	}
