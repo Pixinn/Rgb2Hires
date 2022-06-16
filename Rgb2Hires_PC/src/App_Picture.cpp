@@ -75,21 +75,18 @@ int main( int argc, char *argv[] )
 	}
 
 	//Parsing command line
-	TCLAP::CmdLine cmd("Picture - by Christophe Meneboeuf <christophe@xtof.info>", ' ', "0");
+	TCLAP::CmdLine cmd("Picture - by Christophe Meneboeuf <christophe@xtof.info>", ' ', "0.1");
 	TCLAP::ValueArg<string> imagePath("i", "image", "Source image path", true, "", "path_to_image");
-	TCLAP::ValueArg<string> outputPath("o", "output", "Output path", true, "", "path_to_output");
+	TCLAP::ValueArg<string> outputPath("o", "output", "Output path to write the HIRES file", true, "", "path_to_output");
+	TCLAP::SwitchArg preview("p", "preview", "Open a window to display a live preview.");
 	TCLAP::SwitchArg assembly("a", "asm", "Output asm format");
-	TCLAP::SwitchArg preview("p", "preview", "Open a window to display a preview.");
 	cmd.add(imagePath);
-	cmd.add(outputPath);
+	cmd.xorAdd(outputPath, preview); // live preview or output to disk
 	cmd.add(assembly);
-	cmd.add(preview);
 	cmd.parse(argc, argv);
 
-	if (imagePath.getValue().size() == 0 || outputPath.getValue().size() == 0) {
-		std::cout << "No input or output path provided." << std::endl;				
-		IMG_Quit();
-		return -1;
+	if (imagePath.getValue().size() == 0) {
+		ExitOnError("No input path provided.\n");
 	}
 
     
@@ -107,12 +104,23 @@ int main( int argc, char *argv[] )
 	}
 	const ImageQuantized imageHiRes{ surfaceRgb };
 
-	if (preview.getValue()) {
+	// Preview
+	if (preview.getValue())
+	{
+		if (assembly.getValue() == true)
+		{
+			std::cout << "\nIgnoring --asm option.\n";
+		}
 		const auto bytes = imageHiRes.getHiresBuffer();
 		Display::Window::GetInstance()->display(filepath, bytes->data());
 	}
+	// Convertion to disk
 	else
 	{
+		if (outputPath.getValue().size() == 0) {
+			ExitOnError("No output path provided.\n");
+		}
+
 		if (assembly.getValue() == true) {    //Ouput in ASM
 			ofstream output(outputPath.getValue());
 			output << imageHiRes.getHiresAsm();
