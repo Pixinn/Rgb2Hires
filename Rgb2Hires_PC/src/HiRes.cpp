@@ -1,6 +1,6 @@
 
 /* Rgb2Hires
-* Copyright (C) 2016 Christophe Meneboeuf <christophe@xtof.info>
+* Copyright (C) 2016-2022 Christophe Meneboeuf <christophe@xtof.info>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ namespace RgbToHires {
 		_data[1] = 0;
 	}
 
-	BlockHr::BlockHr(const BlockPixel& source)
+	BlockHr::BlockHr(const BlockPixelRgb& source)
 	{
 		const auto groups = getGroup(source);
 		//Init data, depending on the group
@@ -56,7 +56,7 @@ namespace RgbToHires {
 	}
 
 
-	pair<BlockHr::eColorGroup, BlockHr::eColorGroup> BlockHr::getGroup(const BlockPixel& block) const
+	pair<BlockHr::eColorGroup, BlockHr::eColorGroup> BlockHr::getGroup(const BlockPixelRgb& block) const
 	{
 		pair<eColorGroup, eColorGroup> groups{ UNDEF, UNDEF };
 		//1st block group, including the last semi-pixel
@@ -96,7 +96,7 @@ namespace RgbToHires {
 	}
 
 
-	uint8_t BlockHr::getDibit(const Color& color) const
+	uint8_t BlockHr::getDibit(const ColorRgb& color) const
 	{
 		if (color == WHITE) {
 			return 3;

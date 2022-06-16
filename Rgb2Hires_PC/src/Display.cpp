@@ -1,3 +1,21 @@
+/* Rgb2Hires
+* Copyright (C) 2016-2022 Christophe Meneboeuf <christophe@xtof.info>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include <filesystem>
 #include <stdexcept>
 #include <chrono>
@@ -6,7 +24,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "Picture.h"
 #include "Display.h"
 
 
@@ -16,7 +33,7 @@ using namespace std;
   {
 
 		//! @brief	 Output the colors from a 14-dot block
-		void UpdateHiResRGBCell(const int x, const uint8_t* pLineAddr, rgba8Bits_t* pOut);
+		void UpdateHiResRGBCell(const int x, const uint8_t* pLineAddr, ColorRgb* pOut);
 		std::unique_ptr<Screen> ComputeRgbBuffer(const uint8_t* hires);
 
 
@@ -99,7 +116,7 @@ using namespace std;
 			} error;
 
 			auto pViewport = ComputeRgbBuffer(hiresblob);
-			SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+			SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(ColorRgb) * 560);
 			SDL_RenderClear(_pRenderer);
 			SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
 			SDL_RenderPresent(_pRenderer);
@@ -164,7 +181,7 @@ using namespace std;
 					// update the display with rgb data
 					{
 						std::lock_guard<std::mutex> lock{ this->_mutex }; // protecting pViewport
-						SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(rgba8Bits_t) * 560);
+						SDL_UpdateTexture(_pTexture, nullptr, pViewport->data(), sizeof(ColorRgb) * 560);
 					}
 					SDL_RenderClear(_pRenderer);
 					SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
@@ -184,14 +201,14 @@ using namespace std;
 		}
 
 
-		constexpr std::array<rgba8Bits_t, 7> Palette = {
-			rgba8Bits_t{0x00,0x00,0x00, 0xFF}, // black
-			rgba8Bits_t{0xFF,0xFF,0xFF, 0xFF}, // white
-			rgba8Bits_t{0x07,0xA8,0xE0, 0xFF}, // blue
-			rgba8Bits_t{0xF9,0x56,0x1D, 0xFF}, // orange
-			rgba8Bits_t{0x43,0xC8,0x00, 0xFF}, // green
-			rgba8Bits_t{0xBB,0x36,0xFF, 0xFF}, // violet
-			rgba8Bits_t{0x80,0x80,0x80, 0xFF} // dummy as AppleWin's code can overflow :( (no time to correct it)
+		constexpr std::array<ColorRgb, 7> Palette = {
+			BLACK,
+			WHITE,
+			BLUE,
+			ORANGE,
+			GREEN,
+			VIOLET,
+			BLACK // dummy
 		};
 
 
@@ -205,7 +222,7 @@ using namespace std;
 		//! @param	 x Vertical position of the 14-dot block 
 		//! @param   pLineAddr pointer to the start of the line
 		//! @param	 pOut pointer to the 28-subdot block to draw 
-		void UpdateHiResRGBCell(const int x, const uint8_t* pLineAddr, rgba8Bits_t* pOut)
+		void UpdateHiResRGBCell(const int x, const uint8_t* pLineAddr, ColorRgb* pOut)
 		{
 			const int xpixel = x * 14;
 			int xoffset = x & 1; // offset to start of the 2 bytes
@@ -221,7 +238,7 @@ using namespace std;
 			uint32_t dwordval = (byteval1 & 0x7F) | ((byteval2 & 0x7F) << 7) | ((byteval3 & 0x7F) << 14) | ((byteval4 & 0x7F) << 21);
 
 			// Extraction of 14 color pixels
-			rgba8Bits_t colors[14];
+			ColorRgb colors[14];
 			int idxColor = 0;
 			uint32_t dwordval_tmp = dwordval;
 			dwordval_tmp = dwordval_tmp >> 7;
@@ -238,7 +255,7 @@ using namespace std;
 				if (i % 2) dwordval_tmp >>= 2;
 			}
 			// Black and White
-			rgba8Bits_t bw[2];
+			ColorRgb bw[2];
 			bw[0] = Palette[0];
 			bw[1] = Palette[1];
 

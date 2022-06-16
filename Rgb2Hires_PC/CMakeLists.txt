@@ -25,7 +25,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin/debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bin/release)
 
 # Library
-add_library(${PROJECT_NAME} src/Common.h
+add_library(${PROJECT_NAME}
 							src/HiRes.cpp
 							src/HiRes.h
 							src/ImageQuantized.cpp

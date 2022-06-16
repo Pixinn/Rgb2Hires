@@ -13,7 +13,7 @@ RgbToHires::Tile::Tile(const ImageQuantized& source, const unsigned col, const u
 		line.reserve(NB_BLOCKS_PER_TILE);
 		//Useful data
 		for (auto blockNr = 0u; blockNr < NB_BLOCKS_PER_TILE; ++blockNr) {
-			BlockPixel blockPxRgb;
+			BlockPixelRgb blockPxRgb;
 			for (auto& pxRgb : blockPxRgb) {
 				pxRgb = *pixel_src++;
 			}

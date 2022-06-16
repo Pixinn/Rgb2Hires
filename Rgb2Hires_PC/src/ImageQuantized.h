@@ -1,6 +1,6 @@
 
 /* Rgb2Hires
-* Copyright (C) 2016 Christophe Meneboeuf <christophe@xtof.info>
+* Copyright (C) 2016-2022 Christophe Meneboeuf <christophe@xtof.info>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include <map>
 #include <string>
 
-#include "Common.h"
 #include "HiRes.h"
 
 namespace RgbToHires {
@@ -37,7 +36,7 @@ namespace RgbToHires {
 	public:
 
 		// rgb
-		using BlockRgb = std::array<Color, NB_PIXEL_PER_BLOCK>;
+		using BlockRgb = std::array<ColorRgb, NB_PIXEL_PER_BLOCK>;
 		using Line = std::array<BlockRgb, NB_BLOCK_PER_LINE>;
 		using BlobRgb = std::array<Line, NB_LINES_PER_SCREEN>;
 		// hires
@@ -56,9 +55,9 @@ namespace RgbToHires {
 	  /// @brief Returns an HIRES block 
 
 	private:
-		Color Quantize(const Color& color);
+		ColorRgb Quantize(const ColorRgb& color);
     /// @brief Computes the euclidian distance between two colors
-		double Distance(const Color&, const Color&);
+		double Distance(const ColorRgb&, const ColorRgb&);
 
 
 	private:

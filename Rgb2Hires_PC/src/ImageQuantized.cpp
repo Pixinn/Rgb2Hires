@@ -47,7 +47,7 @@ namespace RgbToHires {
 				BlockRgb blockRgb;
 				for (auto& pixel : blockRgb)
 				{
-					Color color;
+					ColorRgb color;
 					SDL_GetRGB(*srcPx, rgb->format, &color.r, &color.g, &color.b);
 					pixel = Quantize(color);
 					srcPx++;
@@ -120,7 +120,7 @@ namespace RgbToHires {
 
 
 
-	double ImageQuantized::Distance(const Color& color1, const Color& color2)
+	double ImageQuantized::Distance(const ColorRgb& color1, const ColorRgb& color2)
 	{
 
 		static constexpr double LUMA_RED = 0.299;
@@ -142,7 +142,7 @@ namespace RgbToHires {
 	}
 
 
-	inline Color ImageQuantized::Quantize(const Color& color)
+	inline ColorRgb ImageQuantized::Quantize(const ColorRgb& color)
 	{
 		const auto distBlack = Distance(BLACK, color);
 		auto distMin = distBlack;

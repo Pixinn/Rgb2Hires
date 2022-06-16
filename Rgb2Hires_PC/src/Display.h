@@ -29,18 +29,13 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
 
+using namespace RgbToHires;
+
 namespace Display
 {    
 
-  struct rgba8Bits_t
-  {
-    uint8_t r = 0;
-    uint8_t g = 0;
-    uint8_t b = 0;
-    uint8_t a = 0xff;
-  };
 
-  using Block = std::array<rgba8Bits_t, 14>;
+  using Block = std::array<ColorRgb, 14>;
   using Line = std::array<Block, 40>;
   using Screen = std::array<Line, 192 * 2>;
 
