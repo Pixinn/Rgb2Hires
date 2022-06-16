@@ -29,51 +29,48 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
 
-namespace RgbToHires
-{
-	namespace Display
-	{    
+namespace Display
+{    
 
-    struct rgba8Bits_t
-    {
-      uint8_t r = 0;
-      uint8_t g = 0;
-      uint8_t b = 0;
-      uint8_t a = 0xff;
-    };
+  struct rgba8Bits_t
+  {
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+    uint8_t a = 0xff;
+  };
 
-    using Block = std::array<rgba8Bits_t, 14>;
-    using Line = std::array<Block, 40>;
-    using Screen = std::array<Line, 192 * 2>;
+  using Block = std::array<rgba8Bits_t, 14>;
+  using Line = std::array<Block, 40>;
+  using Screen = std::array<Line, 192 * 2>;
 
-    class Window
-    {
-    public:
-      Window() = default;
-      ~Window();
+  class Window
+  {
+  public:
+    Window() = default;
+    ~Window();
       
-      static Window* GetInstance();
+    static Window* GetInstance();
 
-      void display(const std::string& path, const uint8_t* hiresblob);
+    void display(const std::string& path, const uint8_t* hiresblob);
 
-    private:
-      bool init();
-      void sdlError(const std::string& msg);
+  private:
+    bool init();
+    void sdlError(const std::string& msg);
 
-      std::thread* _pThread = nullptr; //< to survey filechange
-      std::mutex   _mutex;
-      std::atomic_bool _isFileModified = false;
-      std::atomic_bool _stopFileSurvey = false;
+    std::thread* _pThread = nullptr; //< to survey filechange
+    std::mutex   _mutex;
+    std::atomic_bool _isFileModified = false;
+    std::atomic_bool _stopFileSurvey = false;
 
-      static Window* S_pInstance;
-      static const int SCALE = 2;
+    static Window* S_pInstance;
+    static const int SCALE = 2;
 
-      SDL_Window*    _pWindow = nullptr;
-      SDL_Renderer*  _pRenderer  = nullptr;
-      SDL_Texture*   _pTexture = nullptr;
-    };
+    SDL_Window*    _pWindow = nullptr;
+    SDL_Renderer*  _pRenderer  = nullptr;
+    SDL_Texture*   _pTexture = nullptr;
+  };
 
-	}
 }
 
 #endif

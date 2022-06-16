@@ -23,7 +23,7 @@ RgbToHires::Tile::Tile(const ImageQuantized& source, const unsigned col, const u
 
 }
 
-std::string RgbToHires::Tile::getAsm() const
+std::string RgbToHires::Tile::getHiresAsm() const
 {
 	std::string assembly;
 	for (const auto& line : _blob)

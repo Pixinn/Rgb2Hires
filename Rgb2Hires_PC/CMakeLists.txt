@@ -30,12 +30,6 @@ add_library(${PROJECT_NAME} src/Common.h
 							src/HiRes.h
 							src/ImageQuantized.cpp
 							src/ImageQuantized.h
-							# src/Picture.h
-							# src/Picture.cpp
-							# src/Tile.h
-							# src/Tile.cpp
-							#src/Display.h
-							#src/Display.cpp
 )
 ## dependencies
 conan_set_find_library_paths(${PROJECT_NAME})
@@ -43,7 +37,10 @@ conan_target_link_libraries(${PROJECT_NAME})
 
 
 # Application Picture
-add_executable(	Picture src/App_Picture.cpp)
+add_executable(	Picture src/App_Picture.cpp
+							src/Display.h
+							src/Display.cpp
+)
 if(NOT WIN32)
 		set_target_properties(Picture PROPERTIES COMPILE_FLAGS -pthread LINK_FLAGS -pthread)
 endif()
@@ -58,23 +55,24 @@ target_link_libraries(Picture ${PROJECT_NAME})
 set_property(TARGET Picture PROPERTY
 						RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
 
+
 ## Application Tile
-#add_executable(Tile src/App_Tile.cpp)
+#add_executable(Tile src/App_Tile.cpp
+#							src/Tile.h
+#							src/Tile.cpp
+#							)
 ### custom definitions
 #target_compile_definitions(Tile PRIVATE cimg_use_png)
 ### dependencies
 #if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9")
 #	target_link_libraries(Tile stdc++fs) # filesystem lib not included in stdc++ for gcc < 9
 #endif()
+#conan_set_find_library_paths(Tile)
+#conan_target_link_libraries(Tile)
+#target_link_libraries(Picture ${PROJECT_NAME})
+### output
 #set_property(TARGET Tile PROPERTY
-#						RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
-#target_include_directories(Tile PRIVATE
-#						${CONAN_INCLUDE_DIRS_SDL}
-#						${CONAN_INCLUDE_DIRS_TCLAP})
-#target_link_libraries(Tile PRIVATE
-#						CONAN_PKG::sdl
-#						${PROJECT_NAME}
+#						RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
 #)
-#
-#
-#
+
+

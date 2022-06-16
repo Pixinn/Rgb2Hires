@@ -19,7 +19,7 @@ namespace RgbToHires
     ~Tile() = default;
 
     /// @brief Returns asm code corresponding to the tile: the lines are not interleaved!
-    std::string getAsm() const;
+    std::string getHiresAsm() const;
 
   private:
     using LineHr = std::vector<BlockHr>;

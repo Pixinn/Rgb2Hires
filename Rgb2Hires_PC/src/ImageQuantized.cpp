@@ -78,7 +78,7 @@ namespace RgbToHires {
 	}
 
 
-	unique_ptr<array<uint8_t, ImageQuantized::FRAME_SIZE>> ImageQuantized::getBlob() const
+	unique_ptr<array<uint8_t, ImageQuantized::FRAME_SIZE>> ImageQuantized::getHiresBuffer() const
 	{
 		auto blob = unique_ptr<array<uint8_t, FRAME_SIZE>>{ new array<uint8_t, FRAME_SIZE> };
 		auto byte_blob = begin(*blob);
@@ -97,7 +97,7 @@ namespace RgbToHires {
 
 
 
-	string ImageQuantized::getAsm() const
+	string ImageQuantized::getHiresAsm() const
 	{
 		string assembly{ "Picture:\n" };
 		for (const auto& line : _hrOrderedLines) 
@@ -155,6 +155,7 @@ namespace RgbToHires {
 		const auto distOrange = Distance(ORANGE, color);
 		if (distMin > distOrange) { distMin = distOrange; }
 		const auto distViolet = Distance(VIOLET, color);
+		if (distMin > distViolet) { distMin = distViolet; }
 
 		if (distMin == distBlack) {
 			return BLACK;

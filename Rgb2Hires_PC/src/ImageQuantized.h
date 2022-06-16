@@ -49,11 +49,11 @@ namespace RgbToHires {
 		ImageQuantized(SDL_Surface* const source);
 		~ImageQuantized() = default;
 
-
 		/// @brief Returns the binary hires picture
-		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getBlob() const;
+		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getHiresBuffer() const;
 		/// @brief Returns asm code corresponding to the image in memory (CA65 format)
-		std::string getAsm() const;
+		std::string getHiresAsm() const;
+	  /// @brief Returns an HIRES block 
 
 	private:
 		Color Quantize(const Color& color);

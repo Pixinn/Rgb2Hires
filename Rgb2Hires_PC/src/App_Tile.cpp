@@ -82,7 +82,7 @@ int main( int argc, char *argv[] )
 		
 		// Always output in asm
 		ofstream output(outputPath.getValue());
-		output << tileHiRes.getAsm();
+		output << tileHiRes.getHiresAsm();
 
 	}
 

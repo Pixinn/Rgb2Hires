@@ -1,10 +1,10 @@
 #include <filesystem>
 #include <stdexcept>
-#include <iostream>
 #include <chrono>
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include "Picture.h"
 #include "Display.h"
@@ -12,8 +12,6 @@
 
 using namespace std;
 
-namespace RgbToHires
-{
   namespace Display
   {
 
@@ -118,24 +116,29 @@ namespace RgbToHires
 					{
 						bool isDone = false;
 						int nbErrors = 0;
+						std::vector<SDL_Surface*> surfaces;
 						while (!isDone) // several attempts as the file may be marked modified before being written
 						{
 							try
 							{
 								this_thread::sleep_for(std::chrono::milliseconds(500)); // 500ms between each attempt
 								// update hires image
-								const auto imageRgb = Magick::Image{ path };
-								auto imageQuantized = ImageQuantized{ imageRgb };
-								const auto imageHiRes = Picture{ imageQuantized };
+								SDL_Surface* surfaceRgb = IMG_Load(path.c_str());
+								surfaces.push_back(surfaceRgb);
+								if (surfaceRgb == nullptr)
+								{
+									throw("Cannot decode " + path);
+								}
+								const RgbToHires::ImageQuantized imageHiRes{ surfaceRgb };
 
 								// rgb conversion from hires data
 								std::lock_guard<std::mutex> lock{ this->_mutex }; // protecting pViewport
-								pViewport = ComputeRgbBuffer(imageHiRes.getBlob()->data());								
+								pViewport = ComputeRgbBuffer(imageHiRes.getHiresBuffer()->data());
 								isDone = true;
 								timeModified = std::filesystem::last_write_time(path);
 								this->_isFileModified.store(isImgModified);
 							}
-							catch (Magick::Error& e)
+							catch (std::exception& e)
 							{
 								++nbErrors;
 								if (nbErrors >= 5) { // 5 atttemps
@@ -146,6 +149,7 @@ namespace RgbToHires
 								}
 							}
 						}
+						for(auto surface : surfaces) { SDL_FreeSurface(surface); }
 					}
 				}
 			}); // thread
@@ -177,24 +181,6 @@ namespace RgbToHires
 				}
 			}
 
-		}
-
-		void SdlError(const std::string& error,
-			SDL_Window* const pWindow = nullptr,
-			SDL_Renderer* const pRenderer = nullptr
-		)
-		{
-			std::cout << "Error: " << error << '\n';
-
-			if (pRenderer != nullptr) {
-				SDL_DestroyRenderer(pRenderer);
-			}
-			if (pWindow != nullptr) {
-				SDL_DestroyWindow(pWindow);
-			}
-			SDL_Quit();
-
-			exit(1);
 		}
 
 
@@ -299,9 +285,9 @@ namespace RgbToHires
 			// Converting line per line, pixel-block per pixel-block
 			auto pViewport = make_unique<Screen>();
 			auto itLine = std::begin(*pViewport);
-			for (const auto lineBlockOffset : LineAdresses)
+			for (const auto lineBlockOffset : RgbToHires::LineAdresses)
 			{
-				for (const auto lineOffset : LineOffsets)
+				for (const auto lineOffset : RgbToHires::LineOffsets)
 				{
 					const uint8_t* pHires = hires + lineBlockOffset + lineOffset;	// interleaved HIRES source line
 					for (std::size_t x = 0; x < itLine->size(); ++x)
@@ -317,6 +303,4 @@ namespace RgbToHires
 			return pViewport;
 		}
 
-
-  }
 }

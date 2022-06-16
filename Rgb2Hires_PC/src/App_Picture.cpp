@@ -16,6 +16,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define SDL_MAIN_HANDLED
 
 #include <exception>
 #include <iostream>
@@ -27,9 +28,7 @@
 #include <tclap/CmdLine.h>
 
 #include "ImageQuantized.h"
-//#include "Picture.h"
-//#include "Tile.h"
-//#include "Display.h"
+#include "Display.h"
 
 using namespace std;
 using namespace RgbToHires;
@@ -108,20 +107,22 @@ int main( int argc, char *argv[] )
 	}
 	const ImageQuantized imageHiRes{ surfaceRgb };
 
-	if (assembly.getValue() == true) {    //Ouput in ASM
-		ofstream output(outputPath.getValue());
-		output << imageHiRes.getAsm();
+	if (preview.getValue()) {
+		const auto bytes = imageHiRes.getHiresBuffer();
+		Display::Window::GetInstance()->display(filepath, bytes->data());
 	}
-	else {	//Binary output
-		ofstream output(outputPath.getValue(), ios::binary);
-		const auto bytes = imageHiRes.getBlob();
-		output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
+	else
+	{
+		if (assembly.getValue() == true) {    //Ouput in ASM
+			ofstream output(outputPath.getValue());
+			output << imageHiRes.getHiresAsm();
+		}
+		else {	//Binary output
+			ofstream output(outputPath.getValue(), ios::binary);
+			const auto bytes = imageHiRes.getHiresBuffer();
+			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
+		}
 	}
-
-	//if (preview.getValue()) {
-	//	const auto bytes = imageHiRes.getBlob();
-	//	Display::Window::GetInstance()->display(filepath, bytes->data());
-	//}
 
 	for (auto surface : surfaces)
 	{
