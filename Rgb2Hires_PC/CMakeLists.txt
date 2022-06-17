@@ -56,23 +56,20 @@ set_property(TARGET Picture PROPERTY
 						RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
 
 
-## Application Tile
-#add_executable(Tile src/App_Tile.cpp
-#							src/Tile.h
-#							src/Tile.cpp
-#							)
-### custom definitions
-#target_compile_definitions(Tile PRIVATE cimg_use_png)
-### dependencies
-#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9")
-#	target_link_libraries(Tile stdc++fs) # filesystem lib not included in stdc++ for gcc < 9
-#endif()
-#conan_set_find_library_paths(Tile)
-#conan_target_link_libraries(Tile)
-#target_link_libraries(Picture ${PROJECT_NAME})
-### output
-#set_property(TARGET Tile PROPERTY
-#						RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
-#)
+# Application Tile
+add_executable(Tile src/App_Tile.cpp)
+## custom definitions
+target_compile_definitions(Tile PRIVATE cimg_use_png)
+## dependencies
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9")
+	target_link_libraries(Tile stdc++fs) # filesystem lib not included in stdc++ for gcc < 9
+endif()
+conan_set_find_library_paths(Tile)
+conan_target_link_libraries(Tile)
+target_link_libraries(Tile ${PROJECT_NAME})
+## output
+set_property(TARGET Tile PROPERTY
+						RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}
+)
 
 

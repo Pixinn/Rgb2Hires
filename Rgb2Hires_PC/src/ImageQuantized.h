@@ -48,11 +48,18 @@ namespace RgbToHires {
 		ImageQuantized(SDL_Surface* const source);
 		~ImageQuantized() = default;
 
+		// Buffer
 		/// @brief Returns the binary hires picture
 		std::unique_ptr <std::array<uint8_t, FRAME_SIZE>> getHiresBuffer() const;
 		/// @brief Returns asm code corresponding to the image in memory (CA65 format)
 		std::string getHiresAsm() const;
-	  /// @brief Returns an HIRES block 
+	  
+		// Tile
+		/// @brief Returns an HIRES tile. The line are not interleaved as in an HIRES framebuffer
+		/// @param col Position: column number of the tile, from 0 to 9
+		/// @param col Position: line number of the tile, from 0 to 11
+		std::string getTile(const unsigned col, const unsigned line) const;
+
 
 	private:
 		ColorRgb Quantize(const ColorRgb& color);

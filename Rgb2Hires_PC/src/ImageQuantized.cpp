@@ -18,6 +18,8 @@
 
 #include <stdexcept>
 #include <iterator>
+#include <iomanip>
+#include <sstream>
 
 #include "ImageQuantized.h"
 
@@ -114,6 +116,43 @@ namespace RgbToHires {
 			assembly.pop_back();
 			assembly += "\n";
 		}
+		return assembly;
+	}
+
+
+
+	std::string ImageQuantized::getTile(const unsigned col, const unsigned line) const
+	{
+		constexpr int TILE_W = 14;
+		constexpr int TILE_H = 16;
+
+		std::string assembly;
+		for (auto lineNr = line * TILE_H;
+				 lineNr < TILE_H * (line + 1); ++lineNr)
+		{
+			std::stringstream stream;
+			stream << ".byte ";
+
+			auto& line = _blobHr[lineNr];
+			const unsigned nbBlockPerTile = TILE_W / NB_PIXEL_PER_BLOCK;
+			for (unsigned blockHrNr = col * nbBlockPerTile;
+					 blockHrNr < nbBlockPerTile * (col + 1); ++blockHrNr)
+			{
+				const auto& block = line[blockHrNr];
+				for (const auto byte : block)
+				{
+					stream << '$' << std::setw(2) << std::setfill('0') << std::uppercase
+						     << std::hex << static_cast<int>(byte) << ", ";
+				}
+			}
+
+			assembly += stream.str();
+			assembly.pop_back(); //removing the last coma
+			assembly.pop_back();
+			assembly += "\n";
+
+		}
+
 		return assembly;
 	}
 

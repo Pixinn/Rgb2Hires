@@ -23,15 +23,17 @@
 #include <string>
 #include <sys/stat.h>
 
-#include <Magick++.h>
+#include <SDL2/SDL_image.h>
 #include <tclap/CmdLine.h>
 
 #include "ImageQuantized.h"
-#include "Picture.h"
 #include "Tile.h"
 
 using namespace std;
 using namespace RgbToHires;
+
+
+
 
 /// @brief Returns true if a file exists
 inline bool exists(const std::string& path)
@@ -40,10 +42,25 @@ inline bool exists(const std::string& path)
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
+
+void ExitOnError(const std::string& message,
+	std::vector<SDL_Surface*> surfaces = {})
+{
+	std::cout << "Error\n" << message << '\n';
+
+	for (auto surface : surfaces)
+	{
+		SDL_FreeSurface(surface);
+	}
+
+	SDL_Quit();
+	IMG_Quit();
+	exit(-1);
+}
+
 /// @brief Program entry point
 int main( int argc, char *argv[] )
 {
-    Magick::InitializeMagick(*argv);
 
 	//Parsing command line
 	TCLAP::CmdLine cmd("Tile - by Christophe Meneboeuf <christophe@xtof.info>", ' ', "0");
@@ -69,28 +86,34 @@ int main( int argc, char *argv[] )
 		std::cout << "Line number shall be < 11" << std::endl;
 		return -1;
 	}
-
-	try
-	{        
-		const auto filepath = imagePath.getValue();
-		if (!exists(filepath)) {
-			throw runtime_error("Cannot read " + filepath);
-		}
-		const auto imageRgb = Magick::Image{ filepath };
-		auto imageQuantized = ImageQuantized{ imageRgb };
-		const auto tileHiRes = Tile{ imageQuantized, column.getValue(), line.getValue()};
+    
+	const auto filepath = imagePath.getValue();
+	if (!exists(filepath)) {
+		throw runtime_error("Cannot read " + filepath);
+	}
+	std::vector<SDL_Surface*> surfaces;
+	SDL_Surface* surfaceRgb = IMG_Load(filepath.c_str());
+	surfaces.push_back(surfaceRgb);
+	if (surfaceRgb == nullptr)
+	{
+		ExitOnError("Cannot decode " + filepath, surfaces);
+	}
+	const ImageQuantized imageHiRes{ surfaceRgb };
+	const auto tileHiRes = imageHiRes.getTile(column.getValue(), line.getValue());
 		
-		// Always output in asm
-		ofstream output(outputPath.getValue());
-		output << tileHiRes.getHiresAsm();
+	// Always output in asm
+	ofstream output(outputPath.getValue());
+	output << tileHiRes;
 
+
+	for (auto surface : surfaces)
+	{
+		SDL_FreeSurface(surface);
 	}
 
-	//Fatal error
-	catch (const exception& e) {
-		cout << e.what();
-		return -1;
-	}
+
+	SDL_Quit();
+	IMG_Quit();
 
     return 0;
 }
