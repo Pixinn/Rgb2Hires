@@ -89,22 +89,29 @@ int main( int argc, char *argv[] )
     
 	const auto filepath = imagePath.getValue();
 	if (!exists(filepath)) {
-		throw runtime_error("Cannot read " + filepath);
+		ExitOnError("Cannot read " + filepath);
 	}
-	std::vector<SDL_Surface*> surfaces;
-	SDL_Surface* surfaceRgb = IMG_Load(filepath.c_str());
-	surfaces.push_back(surfaceRgb);
-	if (surfaceRgb == nullptr)
-	{
-		ExitOnError("Cannot decode " + filepath, surfaces);
-	}
-	const ImageQuantized imageHiRes{ surfaceRgb };
-	const auto tileHiRes = imageHiRes.getTile(column.getValue(), line.getValue());
-		
-	// Always output in asm
-	ofstream output(outputPath.getValue());
-	output << tileHiRes;
 
+	std::vector<SDL_Surface*> surfaces;
+	try
+	{
+		SDL_Surface* surfaceRgb = IMG_Load(filepath.c_str());
+		surfaces.push_back(surfaceRgb);
+		if (surfaceRgb == nullptr)
+		{
+			ExitOnError("Cannot decode " + filepath, surfaces);
+		}
+		const ImageQuantized imageHiRes{ surfaceRgb };
+		const auto tileHiRes = imageHiRes.getTile(column.getValue(), line.getValue());
+
+		// Always output in asm
+		ofstream output(outputPath.getValue());
+		output << tileHiRes;
+	}
+	catch (const std::exception& e)
+	{
+		ExitOnError(e.what(), surfaces);
+	}
 
 	for (auto surface : surfaces)
 	{

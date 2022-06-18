@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.19)
 cmake_policy(SET CMP0074 NEW)
 
-project (Rgb2Hires-SDL)
+project (Rgb2Hires)
 
 # flags not compatibles with magick++
 if(WIN32)

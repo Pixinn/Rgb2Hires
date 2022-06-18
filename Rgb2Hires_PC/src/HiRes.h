@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-#include <SDL.h>
+#include <SDL2/SDL_image.h>
 
 namespace RgbToHires
 {

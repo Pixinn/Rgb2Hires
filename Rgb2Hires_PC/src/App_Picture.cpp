@@ -89,47 +89,54 @@ int main( int argc, char *argv[] )
 		ExitOnError("No input path provided.\n");
 	}
 
-    
-	const auto filepath = imagePath.getValue();
-	if (!exists(filepath)) {
-		ExitOnError("Cannot read " + filepath);
-	}
-
 	std::vector<SDL_Surface*> surfaces;
-	SDL_Surface* surfaceRgb = IMG_Load(filepath.c_str());
-	surfaces.push_back(surfaceRgb);
-	if (surfaceRgb == nullptr)
+	try
 	{
-		ExitOnError("Cannot decode " + filepath, surfaces);
-	}
-	const ImageQuantized imageHiRes{ surfaceRgb };
+		const auto filepath = imagePath.getValue();
+		if (!exists(filepath)) {
+			ExitOnError("Cannot read " + filepath);
+		}
 
-	// Preview
-	if (preview.getValue())
-	{
-		if (assembly.getValue() == true)
+		SDL_Surface* surfaceRgb = IMG_Load(filepath.c_str());
+		surfaces.push_back(surfaceRgb);
+		if (surfaceRgb == nullptr)
 		{
-			std::cout << "\nIgnoring --asm option.\n";
+			ExitOnError("Cannot decode " + filepath, surfaces);
 		}
-		const auto bytes = imageHiRes.getHiresBuffer();
-		Display::Window::GetInstance()->display(filepath, bytes->data());
-	}
-	// Convertion to disk
-	else
-	{
-		if (outputPath.getValue().size() == 0) {
-			ExitOnError("No output path provided.\n");
+		const ImageQuantized imageHiRes{ surfaceRgb };
+
+		// Preview
+		if (preview.getValue())
+		{
+			if (assembly.getValue() == true)
+			{
+				std::cout << "\nIgnoring --asm option.\n";
+			}
+			const auto bytes = imageHiRes.getHiresBuffer();
+			Display::Window::GetInstance()->display(filepath, bytes->data());
+		}
+		// Convertion to disk
+		else
+		{
+			if (outputPath.getValue().size() == 0) {
+				ExitOnError("No output path provided.\n");
+			}
+
+			if (assembly.getValue() == true) {    //Ouput in ASM
+				ofstream output(outputPath.getValue());
+				output << imageHiRes.getHiresAsm();
+			}
+			else {	//Binary output
+				ofstream output(outputPath.getValue(), ios::binary);
+				const auto bytes = imageHiRes.getHiresBuffer();
+				output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
+			}
 		}
 
-		if (assembly.getValue() == true) {    //Ouput in ASM
-			ofstream output(outputPath.getValue());
-			output << imageHiRes.getHiresAsm();
-		}
-		else {	//Binary output
-			ofstream output(outputPath.getValue(), ios::binary);
-			const auto bytes = imageHiRes.getHiresBuffer();
-			output.write(reinterpret_cast<const char*>(bytes.get()), bytes->size());
-		}
+	}
+	catch (const std::exception& e)
+	{
+		ExitOnError(e.what(), surfaces);
 	}
 
 	for (auto surface : surfaces)
