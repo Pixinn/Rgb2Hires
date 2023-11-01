@@ -33,7 +33,7 @@ __Note:__ For more information about the "Hires" format and its limitations, you
 
 ### Dependencies
 
-The dependencies are managed by [conan.io](https://conan.io/). Please refer to (their documentation)[https://docs.conan.io/en/latest/installation.html] for installation instructions.
+The dependencies are managed by [conan.io](https://conan.io/). Please refer to [their documentation](https://docs.conan.io/en/latest/installation.html) for installation instructions.
 
 The build system is managed by CMake.
 
